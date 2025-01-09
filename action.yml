@@ -1,0 +1,94 @@
+name: Setup Environment
+
+description: |
+  This action sets up the runtime, installs dependencies, and runs tests for Node.js, Deno, or Bun.
+
+inputs:
+  runtime:
+    description: 'The runtime to use (node, deno, or bun)'
+    required: true
+    type: string
+  version:
+    description: 'The version of the runtime'
+    required: true
+    type: string
+  pm:
+    description: 'Package manager to use (npm, yarn, pnpm)'
+    required: false
+    type: string
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 🚚 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🐳 Set up Node.js
+      if: ${{ inputs.runtime == 'node' }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.version }}
+
+    - name: 🦕 Set up Deno
+      if: ${{ inputs.runtime == 'deno' }}
+      uses: denoland/setup-deno@v2
+      with:
+        deno-version: ${{ inputs.version }}
+
+    - name: 🍞 Set up Bun
+      if: ${{ inputs.runtime == 'bun' }}
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: ${{ inputs.version }}
+
+    - name: 📦 Install dependencies
+      run: |
+        case "${{ inputs.runtime }}" in
+          "node")
+            echo "⚙️ Installing ${{ inputs.pm }} dependencies"
+            corepack enable
+            if [[ "${{ inputs.pm }}" == "yarn" ]]; then
+              YARN_VERSION=$(yarn --version)
+              jq ".packageManager = \"yarn@$YARN_VERSION\"" package.json > yarn-package.json
+              mv package.json main-package.json
+              mv yarn-package.json package.json
+            fi
+            corepack prepare ${{ inputs.pm }}@latest --activate
+            if [[ "${{ inputs.pm }}" == "npm" ]]; then
+              npm install --legacy-peer-deps
+            else
+              ${{ inputs.pm }} install
+            fi
+            ;;
+          "deno")
+            echo "⚙️ Installing Deno dependencies"
+            deno install
+            ;;
+          "bun")
+            echo "⚙️ Installing Bun dependencies"
+            bun install
+            ;;
+        esac
+      shell: bash
+
+    - name: 🧪 Run tests
+      run: |
+        case "${{ inputs.runtime }}" in
+          "node")
+            echo "✅ Running tests with ${{ inputs.pm }}"
+            ${{ inputs.pm }} run test
+            ;;
+          "deno")
+            echo "✅ Running tests with Deno"
+            deno task test
+            ;;
+          "bun")
+            echo "✅ Running tests with Bun"
+            bun run test
+            ;;
+        esac
+      shell: bash
+
+    - name: 🎉 Finish test workflow
+      run: echo "🎯 Tests completed for ${{ inputs.runtime }} ${{ inputs.version }}!"
+      shell: bash
