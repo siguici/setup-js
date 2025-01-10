@@ -16,6 +16,12 @@ inputs:
     description: 'Package manager to use (npm, yarn, pnpm)'
     required: false
     type: string
+    default: npm
+  scripts:
+    description: 'A comma-separated list of scripts to run (e.g., lint, build, test)'
+    required: false
+    type: string
+    default: test
 
 runs:
   using: 'composite'
@@ -75,27 +81,15 @@ runs:
         esac
       shell: bash
 
-    - name: 🧪 Run tests
+    - name: 🔨 Execute scripts
       run: |
-        case "${{ inputs.runtime }}" in
-          "node")
-            echo "✅ Running tests with ${{ inputs.pm }}"
-            ${{ inputs.pm }} run test
-            ;;
-          "deno")
-            echo "✅ Running tests with Deno"
-            deno task test
-            ;;
-          "bun")
-            echo "✅ Running tests with Bun"
-            bun run test
-            ;;
-          *)
-            echo "❌ Invalid runtime specified: ${{ inputs.runtime }}"
-            exit 1
-            ;;
-        esac
+        chmod +x ./scripts/run.sh
+        ./scripts/run.sh
       shell: bash
+      env:
+        scripts: ${{ inputs.scripts }}
+        runtime: ${{ inputs.runtime }}
+        pm: ${{ inputs.pm }}
 
     - name: 🎉 Finish test workflow
       run: echo "🎯 Tests completed for ${{ inputs.runtime }} ${{ inputs.version }}!"
