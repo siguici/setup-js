@@ -37,7 +37,7 @@ for the specified runtime
 - `pm` (optional)
 
   - Description: The package manager to use.
-  - Default: `npm`
+  - Default: [Automatically detected](#-package-manager-detection)
   - Options: `npm`, `yarn`, `pnpm`
   - Example: `yarn`
 
@@ -133,6 +133,48 @@ jobs:
           version: ${{ matrix.version }}
           pm: ${{ matrix.pm }}
           scripts: check,build,test
+```
+
+## 📦 Package Manager Detection
+
+This action automatically detects the package manager to use
+based on your project configuration if it is not explicitly defined.
+The detection process follows these steps:
+
+1. **`package.json` Field**:
+   - If the `packageManager` field is defined in `package.json`,
+   the action uses this value to determine the package manager and its version.
+
+2. **Lock Files**:
+   - If no `packageManager` field is found,
+   the action checks for the following lock files in order of precedence:
+     - `pnpm-lock.yaml` → **pnpm**
+     - `yarn.lock` → **yarn**
+     - `package-lock.json` → **npm**
+     - `bun.lockb` → **bun**
+     - `deno.lock` → **deno**
+
+3. **Runtime Environment**:
+   - If no lock files are present, the runtime environment is checked:
+     - If the runtime is **Deno**, the action defaults to **deno**.
+     - If the runtime is **Bun**, the action defaults to **bun**.
+
+4. **Fallback**:
+   - If none of the above methods determine the package manager,
+   the action defaults to **npm**.
+
+This ensures that the action is flexible and works seamlessly
+with different project setups and configurations.
+
+### ℹ️ Customization
+
+If you want to override the detected package manager,
+you can explicitly specify it using the `pm` input.
+For example:
+
+```yaml
+with:
+  pm: yarn
 ```
 
 ## 📖 Notes
