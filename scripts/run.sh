@@ -28,19 +28,23 @@ for script in "${scripts[@]}"; do
   message=$(get_script_message "$script")
   echo "$message..."
 
-  case "$runtime" in
-    "node")
-      $pm run $script
-      echo "ℹ️ $pm run $script executed"
-      ;;
-    "deno")
-      deno task $script
-      echo "ℹ️ deno task $script executed"
-      ;;
-    "bun")
-      bun run $script
-      echo "ℹ️ bun run $script executed"
-      ;;
+  case "$pm" in
+  "npm"|"bun")
+    $pm run $script
+    echo "ℹ️ $pm run $script executed"
+    ;;
+  "pnpm"|"yarn")
+    $pm $script
+    echo "ℹ️ $pm $script executed"
+    ;;
+  "deno")
+    deno task $script
+    echo "ℹ️ deno task $script executed"
+    ;;
+  *)
+    echo "❌ Unknown package manager: $pm"
+    exit 1
+    ;;
   esac
 done
 

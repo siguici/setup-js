@@ -69,6 +69,7 @@ runs:
         ./scripts/pm.sh
       env:
         input_pm: ${{ inputs.pm }}
+        runtime: ${{ inputs.runtime }}
         GITHUB_ENV: $GITHUB_ENV
       shell: bash
 
@@ -82,42 +83,30 @@ runs:
     - name: 📦 Install dependencies
       working-directory: ${{ inputs.cwd }}
       run: |
-        case "${{ inputs.runtime }}" in
-          "node")
-            echo "⚙️ Installing ${{ env.pm }} dependencies"
-            corepack enable
-            if [[ "${{ env.pm }}" == "yarn" ]]; then
-              echo "ℹ️ Yarn detected, preparing package.json..."
-              if [[ "${{ env.pm_version }}" == "latest" ]]; then
-                pm_version=$(yarn --version)
-              else
-                pm_version=${{ env.pm_version }}
-              fi
-              echo "ℹ️ Defining the 'packageManager' field to 'yarn@$pm_version'..."
-              jq ".packageManager = \"yarn@$pm_version\"" package.json > yarn-package.json
-              mv package.json main-package.json
-              mv yarn-package.json package.json
-            fi
-            corepack prepare ${{ env.pm }}@${{ env.pm_version }} --activate
-            if [[ "${{ env.pm }}" == "npm" ]]; then
-              npm install --legacy-peer-deps
+        if [[ "${{ inputs.runtime }}" == "node" ]]; then
+          echo "⚙️ Installing ${{ env.pm }} dependencies"
+          corepack enable
+          if [[ "${{ env.pm }}" == "yarn" ]]; then
+            echo "ℹ️ Yarn detected, preparing package.json..."
+            if [[ "${{ env.pm_version }}" == "latest" ]]; then
+              pm_version=$(yarn --version)
             else
-              ${{ env.pm }} install
+              pm_version=${{ env.pm_version }}
             fi
-            ;;
-          "deno")
-            echo "⚙️ Installing Deno dependencies"
-            deno install
-            ;;
-          "bun")
-            echo "⚙️ Installing Bun dependencies"
-            bun install
-            ;;
-          *)
-            echo "❌ Invalid runtime specified: ${{ inputs.runtime }}"
-            exit 1
-            ;;
-        esac
+            echo "ℹ️ Defining the 'packageManager' field to 'yarn@$pm_version'..."
+            jq ".packageManager = \"yarn@$pm_version\"" package.json > yarn-package.json
+            mv package.json main-package.json
+            mv yarn-package.json package.json
+          fi
+          corepack prepare ${{ env.pm }}@${{ env.pm_version }} --activate
+          if [[ "${{ env.pm }}" == "npm" ]]; then
+            npm install --legacy-peer-deps
+          else
+            ${{ env.pm }} install
+          fi
+        else
+          ${{ env.pm }} install
+        fi
       shell: bash
 
     - name: 🔨 Execute scripts
@@ -129,7 +118,6 @@ runs:
       shell: bash
       env:
         scripts: ${{ inputs.scripts }}
-        runtime: ${{ inputs.runtime }}
         pm: ${{ env.pm }}
 
     - name: 🎉 Finish test workflow
