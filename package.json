@@ -1,0 +1,39 @@
+{
+  "name": "setup-js",
+  "version": "0.0.0",
+  "description": "GitHub Action to set up JavaScript/TypeScript environments by installing dependencies",
+  "keywords": [
+    "github-action",
+    "setup-js",
+    "setup-node",
+    "setup-deno",
+    "setup-bun"
+  ],
+  "homepage": "https://github.com/siguici/setup-js#readme",
+  "bugs": "https://github.com/siguici/setup-js/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/siguici/setup-js.git"
+  },
+  "license": "MIT",
+  "author": "Sigui Kessé Emmanuel <siguici@proton.me>",
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit && biome ci .",
+    "check:format": "biome format .",
+    "check:lint": "biome check .",
+    "fix": "pnpm lint && pnpm format",
+    "format": "biome format --write .",
+    "lint": "biome check --write .",
+    "test": "node --loader tsm --enable-source-maps bin/test.ts"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@japa/assert": "^4.0.1",
+    "@japa/runner": "^4.1.0",
+    "@types/node": "^22.10.5",
+    "tslib": "^2.8.1",
+    "tsm": "^2.3.0",
+    "typescript": "^5.7.3"
+  }
+}
