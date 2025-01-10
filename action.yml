@@ -11,17 +11,14 @@ inputs:
   runtime:
     description: 'The runtime to use (node, deno, or bun)'
     required: false
-    type: string
     default: node
   version:
     description: 'The version of the runtime'
     required: false
-    type: string
     default: latest
   pm:
     description: 'Package manager to use (npm, yarn, pnpm)'
     required: false
-    type: string
     default: npm
   scripts:
     description: 'A comma-separated list of scripts to run in order (e.g., lint, build, test)'
