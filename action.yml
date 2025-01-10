@@ -66,7 +66,8 @@ runs:
       id: detect-pm
       working-directory: ${{ inputs.cwd }}
       run: |
-        ./scripts/pm.sh
+        chmod +x "${{ github.action_path }}/scripts/pm.sh"
+        bash "${{ github.action_path }}/scripts/pm.sh"
       env:
         input_pm: ${{ inputs.pm }}
         runtime: ${{ inputs.runtime }}
@@ -113,8 +114,8 @@ runs:
       if: ${{ inputs.scripts }}
       working-directory: ${{ inputs.cwd }}
       run: |
-        chmod +x ./scripts/run.sh
-        ./scripts/run.sh
+        chmod +x "${{ github.action_path }}/scripts/run.sh"
+        bash "${{ github.action_path }}/scripts/run.sh"
       shell: bash
       env:
         scripts: ${{ inputs.scripts }}
