@@ -5,9 +5,15 @@ if [ -z "$GITHUB_ENV" ]; then
   exit 1
 fi
 
+parse_pm() {
+  local input=$1
+  local name=$(echo "$input" | grep -o '^[^@]*')
+  local version=$(echo "$input" | grep -o '@.*' | sed 's/^@//' || echo "latest")
+  echo "$name $version"
+}
+
 if [ -n "$input_pm" ] && [ "${#input_pm}" -gt 1 ]; then
-  pm=$(echo "$input_pm" | grep -o '^[^@]*')
-  pm_version=$(echo "$input_pm" | grep -o '@.*' | sed 's/^@//' || echo "latest")
+  read -r pm pm_version <<< "$(parse_pm "$input_pm")"
 
   [ -z "$pm_version" ] && pm_version="latest"
 
@@ -16,29 +22,59 @@ if [ -n "$input_pm" ] && [ "${#input_pm}" -gt 1 ]; then
     exit 1
   fi
 else
-  if [ -f "pnpm-lock.yaml" ]; then
-    pm="pnpm"
-    pm_lockfile="pnpm-lock.yaml"
-  elif [ -f "yarn.lock" ]; then
-    pm="yarn"
-    pm_lockfile="yarn.lock"
-  elif [ -f "package-lock.json" ]; then
-    pm="npm"
-    pm_lockfile="package-lock.json"
-  elif [ -f "bun.lockb" ]; then
-    pm="bun"
-    pm_lockfile="bun.lockb"
-  elif [ -f "deno.lock" ]; then
-    pm="deno"
-    pm_lockfile="deno.lock"
-  else
-    pm="npm"
-    pm_lockfile="package-lock.json"
+  if [ -f "package.json" ]; then
+    package_manager=$(jq -r '.packageManager // empty' package.json 2>/dev/null)
+    if [ -n "$package_manager" ]; then
+      read -r pm pm_version <<< "$(parse_pm "$package_manager")"
+    fi
   fi
 
-  pm_version="latest"
+  if [ -z "$pm" ]; then
+    if [ -f "pnpm-lock.yaml" ]; then
+      pm="pnpm"
+      pm_lockfile="pnpm-lock.yaml"
+    elif [ -f "yarn.lock" ]; then
+      pm="yarn"
+      pm_lockfile="yarn.lock"
+    elif [ -f "package-lock.json" ]; then
+      pm="npm"
+      pm_lockfile="package-lock.json"
+    elif [ -f "bun.lockb" ]; then
+      pm="bun"
+      pm_lockfile="bun.lockb"
+    elif [ -f "deno.lock" ]; then
+      pm="deno"
+      pm_lockfile="deno.lock"
+    fi
+  fi
+
+  if [ -z "$pm" ]; then
+    if [ -z "$runtime" ]; then
+      if command -v bun &>/dev/null; then
+        pm="bun"
+      elif command -v deno &>/dev/null; then
+        pm="deno"
+      else
+        pm="node"
+      fi
+    fi
+
+    case "$runtime" in
+      "bun")
+        pm="bun"
+        ;;
+      "deno")
+        pm="deno"
+        ;;
+      *)
+        pm="npm"
+        ;;
+    esac
+  fi
+
+  pm_version=${pm_version:-"latest"}
 fi
 
 echo "pm=$pm" >> "$GITHUB_ENV"
 echo "pm_version=$pm_version" >> "$GITHUB_ENV"
-echo "pm_lockfile=$pm_lockfile" >> "$GITHUB_ENV"
+echo "pm_lockfile=${pm_lockfile:-none}" >> "$GITHUB_ENV"
