@@ -23,20 +23,26 @@ for the specified runtime
 
 - `runtime` (required)
 
-    Description: The runtime to use.
-    Options: `node`, `deno`, `bun`
-    Example: `node`
+  - Description: The runtime to use.
+  - Options: `node`, `deno`, `bun`
+  - Example: `node`
 
 - `version` (required)
 
-    Description: The version of the runtime to use.
-    Example: 14.17.0
+  - Description: The version of the runtime to use.
+  - Example: 14.17.0
 
 - `pm` (optional)
 
-    Description: The package manager to use.
-    Options: `npm`, `yarn`, `pnpm` (default: `npm`)
-    Example: `yarn`
+  - Description: The package manager to use.
+  - Options: `npm`, `yarn`, `pnpm` (default: `npm`)
+  - Example: `yarn`
+
+- `scripts` (optional)
+
+  - Description: A comma-separated list of scripts to run in order.
+  - Example: `check,build,test,deploy`
+  - Default: test
 
 ## 🚚 Outputs
 
@@ -72,6 +78,7 @@ jobs:
           runtime: node
           version: '14.17.0'
           pm: yarn
+          scripts: check,test
 ```
 
 In this example, the action sets up the Node.js environment with version 14.17.0
@@ -108,7 +115,7 @@ jobs:
             pm: pnpm
           - runtime: deno
             pm: yarn
-    name: 👷 CI ${{ matrix.runtime }}-${{ matrix.version }} under ${{ matrix.os }} using ${{ matrix.pm }}
+    name: 👷 CI ${{ matrix.runtime }}@${{ matrix.version }} under ${{ matrix.os }} using ${{ matrix.pm }}
 
     timeout-minutes: 60
 
@@ -122,6 +129,7 @@ jobs:
           runtime: ${{ matrix.runtime }}
           version: ${{ matrix.version }}
           pm: ${{ matrix.pm }}
+          scripts: check,build,test
 ```
 
 ## 📖 Notes
@@ -130,9 +138,9 @@ jobs:
 the action will set up the specified version and install dependencies
 using your selected package manager (`npm`, `yarn`, `pnpm`).
 - ✅ Deno: For Deno, the action installs dependencies using `deno install`
-and runs tests with `deno task test`
+and runs scripts with `deno task script-name`
 - ✅ Bun: For Bun, it installs dependencies using `bun install`
-and runs tests with `bun run test`.
+and runs scripts with `bun run script-name`.
 
 ## 🛡️ License
 

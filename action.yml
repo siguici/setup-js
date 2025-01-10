@@ -1,7 +1,7 @@
-name: Setup Environment
+name: Setup JavaScript/TypeScript Environment
 
 description: |
-  This action sets up the runtime, installs dependencies, and runs tests for Node.js, Deno, or Bun.
+  This action sets up the runtime, installs dependencies, and runs scripts for Node.js, Deno, or Bun.
 
 inputs:
   runtime:
@@ -18,7 +18,7 @@ inputs:
     type: string
     default: npm
   scripts:
-    description: 'A comma-separated list of scripts to run (e.g., lint, build, test)'
+    description: 'A comma-separated list of scripts to run in order (e.g., lint, build, test)'
     required: false
     type: string
     default: test
