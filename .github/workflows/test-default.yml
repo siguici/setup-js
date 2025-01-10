@@ -1,0 +1,23 @@
+name: Test Default
+
+on: ['push', 'pull_request']
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        experimental: [false]
+    name: 👷 CI on ${{ matrix.os }}
+
+    timeout-minutes: 60
+
+    steps:
+      - name: 🚚 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Test Environment
+        uses: ./

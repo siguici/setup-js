@@ -6,12 +6,14 @@ description: |
 inputs:
   runtime:
     description: 'The runtime to use (node, deno, or bun)'
-    required: true
+    required: false
     type: string
+    default: node
   version:
     description: 'The version of the runtime'
-    required: true
+    required: false
     type: string
+    default: latest
   pm:
     description: 'Package manager to use (npm, yarn, pnpm)'
     required: false
@@ -20,8 +22,6 @@ inputs:
   scripts:
     description: 'A comma-separated list of scripts to run in order (e.g., lint, build, test)'
     required: false
-    type: string
-    default: test
 
 runs:
   using: 'composite'
@@ -48,6 +48,7 @@ runs:
         bun-version: ${{ inputs.version }}
 
     - name: 📦 Install dependencies
+      if: ${{ inputs.scripts }}
       run: |
         case "${{ inputs.runtime }}" in
           "node")

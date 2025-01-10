@@ -21,28 +21,30 @@ for the specified runtime
 
 ## 🛠️ Inputs
 
-- `runtime` (required)
+- `runtime` (optional)
 
   - Description: The runtime to use.
+  - Default: `node`
   - Options: `node`, `deno`, `bun`
-  - Example: `node`
+  - Example: `deno`
 
-- `version` (required)
+- `version` (optional)
 
   - Description: The version of the runtime to use.
-  - Example: 14.17.0
+  - Default: latest
+  - Example: 22.12.0
 
 - `pm` (optional)
 
   - Description: The package manager to use.
-  - Options: `npm`, `yarn`, `pnpm` (default: `npm`)
+  - Default: npm
+  - Options: `npm`, `yarn`, `pnpm`
   - Example: `yarn`
 
 - `scripts` (optional)
 
   - Description: A comma-separated list of scripts to run in order.
   - Example: `check,build,test,deploy`
-  - Default: test
 
 ## 🚚 Outputs
 
@@ -74,11 +76,6 @@ jobs:
 
       - name: Set up the environment
         uses: @siguici/setup-js@v1
-        with:
-          runtime: node
-          version: '14.17.0'
-          pm: yarn
-          scripts: check,test
 ```
 
 In this example, the action sets up the Node.js environment with version 14.17.0
