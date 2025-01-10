@@ -23,6 +23,10 @@ inputs:
   scripts:
     description: 'A comma-separated list of scripts to run in order (e.g., lint, build, test)'
     required: false
+  cwd:
+    description: 'Current working directory for commands'
+    required: false
+    default: '.'
 
 runs:
   using: 'composite'
@@ -49,6 +53,7 @@ runs:
         bun-version: ${{ inputs.version }}
 
     - name: 📦 Install dependencies
+      working-directory: ${{ inputs.cwd }}
       run: |
         case "${{ inputs.runtime }}" in
           "node")
@@ -84,6 +89,7 @@ runs:
 
     - name: 🔨 Execute scripts
       if: ${{ inputs.scripts }}
+      working-directory: ${{ inputs.cwd }}
       run: |
         chmod +x ./scripts/run.sh
         ./scripts/run.sh

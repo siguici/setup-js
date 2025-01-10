@@ -37,7 +37,7 @@ for the specified runtime
 - `pm` (optional)
 
   - Description: The package manager to use.
-  - Default: npm
+  - Default: `npm`
   - Options: `npm`, `yarn`, `pnpm`
   - Example: `yarn`
 
@@ -45,6 +45,12 @@ for the specified runtime
 
   - Description: A comma-separated list of scripts to run in order.
   - Example: `check,build,test,deploy`
+
+- `cwd` (optional)
+
+  - Description: The directory in which to execute the commands.
+  - Default: `.`
+  - Example: `./docs`
 
 ## 🚚 Outputs
 
