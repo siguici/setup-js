@@ -27,6 +27,17 @@ inputs:
     required: false
     default: '.'
 
+outputs:
+  pm:
+    description: 'Detected package manager'
+    value: ''
+  pm_version:
+    description: 'Version of the package manager'
+    value: ''
+  pm_lockfile:
+    description: 'Detected lockfile'
+    value: ''
+
 runs:
   using: 'composite'
   steps:
@@ -52,7 +63,10 @@ runs:
         bun-version: ${{ inputs.version }}
 
     - name: 🔍 Detect package manager
-      run: ./scripts/pm.sh
+      id: detect-pm
+      working-directory: ${{ inputs.cwd }}
+      run: |
+        ./scripts/pm.sh
       env:
         input_pm: ${{ inputs.pm }}
         GITHUB_ENV: $GITHUB_ENV
@@ -60,46 +74,24 @@ runs:
 
     - name: 📋 Display detected values
       run: |
-        echo "Package Manager: $pm"
-        echo "Version: $pm_version"
-        echo "Lockfile: $pm_lockfile"
+        echo "Package Manager: ${{ steps.detect-pm.outputs.pm }}"
+        echo "Version: ${{ steps.detect-pm.outputs.pm_version }}"
+        echo "Lockfile: ${{ steps.detect-pm.outputs.pm_lockfile }}"
       shell: bash
 
     - name: 📦 Install dependencies
       working-directory: ${{ inputs.cwd }}
       run: |
-        case "${{ inputs.runtime }}" in
-          "node")
-            echo "⚙️ Installing ${{ inputs.pm }} dependencies"
-            corepack enable
-            if [[ "${{ pm }}" == "yarn" ]]; then
-              if [[ "${{ pm_version }}" == "latest" ]] then
-                pm_version=$(yarn --version)
-              fi
-              jq ".packageManager = \"yarn@$pm_version\"" package.json > yarn-package.json
-              mv package.json main-package.json
-              mv yarn-package.json package.json
-            fi
-            corepack prepare ${{ pm }}@${{ pm_version }} --activate
-            if [[ "${{ inputs.pm }}" == "npm" ]]; then
-              npm install --legacy-peer-deps
-            else
-              ${{ pm }} install
-            fi
-            ;;
-          "deno")
-            echo "⚙️ Installing Deno dependencies"
-            deno install
-            ;;
-          "bun")
-            echo "⚙️ Installing Bun dependencies"
-            bun install
-            ;;
-          *)
-            echo "❌ Invalid runtime specified: ${{ inputs.runtime }}"
-            exit 1
-            ;;
-        esac
+        echo "Installing dependencies with ${{ steps.detect-pm.outputs.pm }}"
+        corepack enable
+        if [[ "${{ steps.detect-pm.outputs.pm }}" == "yarn" ]]; then
+          echo "Yarn detected, preparing package.json..."
+          jq ".packageManager = \"yarn@${{ steps.detect-pm.outputs.pm_version }}\"" package.json > yarn-package.json
+          mv package.json main-package.json
+          mv yarn-package.json package.json
+        fi
+        corepack prepare ${{ steps.detect-pm.outputs.pm }}@${{ steps.detect-pm.outputs.pm_version }} --activate
+        ${{ steps.detect-pm.outputs.pm }} install
       shell: bash
 
     - name: 🔨 Execute scripts
@@ -112,7 +104,7 @@ runs:
       env:
         scripts: ${{ inputs.scripts }}
         runtime: ${{ inputs.runtime }}
-        pm: ${{ pm }}
+        pm: ${{ steps.detect-pm.outputs.pm }}
 
     - name: 🎉 Finish test workflow
       run: echo "🎯 Tests completed for ${{ inputs.runtime }} ${{ inputs.version }}!"
