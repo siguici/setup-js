@@ -68,6 +68,10 @@ runs:
             echo "⚙️ Installing Bun dependencies"
             bun install
             ;;
+          *)
+            echo "❌ Invalid runtime specified: ${{ inputs.runtime }}"
+            exit 1
+            ;;
         esac
       shell: bash
 
@@ -85,6 +89,10 @@ runs:
           "bun")
             echo "✅ Running tests with Bun"
             bun run test
+            ;;
+          *)
+            echo "❌ Invalid runtime specified: ${{ inputs.runtime }}"
+            exit 1
             ;;
         esac
       shell: bash
