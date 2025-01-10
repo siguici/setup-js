@@ -44,24 +44,6 @@ runs:
     - name: 🚚 Checkout repository
       uses: actions/checkout@v4
 
-    - name: 🐳 Set up Node.js
-      if: ${{ inputs.runtime == 'node' }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ inputs.version }}
-
-    - name: 🦕 Set up Deno
-      if: ${{ inputs.runtime == 'deno' }}
-      uses: denoland/setup-deno@v2
-      with:
-        deno-version: ${{ inputs.version }}
-
-    - name: 🍞 Set up Bun
-      if: ${{ inputs.runtime == 'bun' }}
-      uses: oven-sh/setup-bun@v2
-      with:
-        bun-version: ${{ inputs.version }}
-
     - name: 🔍 Detect package manager
       id: detect-pm
       working-directory: ${{ inputs.cwd }}
@@ -80,6 +62,24 @@ runs:
         echo "Version: ${{ env.pm_version }}"
         echo "Lockfile: ${{ env.pm_lockfile }}"
       shell: bash
+
+    - name: 🐳 Set up Node.js
+      if: ${{ inputs.runtime == 'node' }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.version }}
+
+    - name: 🦕 Set up Deno
+      if: ${{ inputs.runtime == 'deno' || env.pm == 'deno' }}
+      uses: denoland/setup-deno@v2
+      with:
+        deno-version: ${{ inputs.version }}
+
+    - name: 🦄 Set up Bun
+      if: ${{ inputs.runtime == 'bun' || env.pm == 'bun' }}
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: ${{ inputs.version }}
 
     - name: 📦 Install dependencies
       working-directory: ${{ inputs.cwd }}
