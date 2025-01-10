@@ -19,7 +19,6 @@ inputs:
   pm:
     description: 'Package manager to use (npm, yarn, pnpm)'
     required: false
-    default: npm
   scripts:
     description: 'A comma-separated list of scripts to run in order (e.g., lint, build, test)'
     required: false
@@ -52,6 +51,20 @@ runs:
       with:
         bun-version: ${{ inputs.version }}
 
+    - name: 🔍 Detect package manager
+      run: ./scripts/pm.sh
+      env:
+        input_pm: ${{ inputs.pm }}
+        GITHUB_ENV: $GITHUB_ENV
+      shell: bash
+
+    - name: 📋 Display detected values
+      run: |
+        echo "Package Manager: $pm"
+        echo "Version: $pm_version"
+        echo "Lockfile: $pm_lockfile"
+      shell: bash
+
     - name: 📦 Install dependencies
       working-directory: ${{ inputs.cwd }}
       run: |
@@ -59,17 +72,19 @@ runs:
           "node")
             echo "⚙️ Installing ${{ inputs.pm }} dependencies"
             corepack enable
-            if [[ "${{ inputs.pm }}" == "yarn" ]]; then
-              YARN_VERSION=$(yarn --version)
-              jq ".packageManager = \"yarn@$YARN_VERSION\"" package.json > yarn-package.json
+            if [[ "${{ pm }}" == "yarn" ]]; then
+              if [[ "${{ pm_version }}" == "latest" ]] then
+                pm_version=$(yarn --version)
+              fi
+              jq ".packageManager = \"yarn@$pm_version\"" package.json > yarn-package.json
               mv package.json main-package.json
               mv yarn-package.json package.json
             fi
-            corepack prepare ${{ inputs.pm }}@latest --activate
+            corepack prepare ${{ pm }}@${{ pm_version }} --activate
             if [[ "${{ inputs.pm }}" == "npm" ]]; then
               npm install --legacy-peer-deps
             else
-              ${{ inputs.pm }} install
+              ${{ pm }} install
             fi
             ;;
           "deno")
@@ -97,7 +112,7 @@ runs:
       env:
         scripts: ${{ inputs.scripts }}
         runtime: ${{ inputs.runtime }}
-        pm: ${{ inputs.pm }}
+        pm: ${{ pm }}
 
     - name: 🎉 Finish test workflow
       run: echo "🎯 Tests completed for ${{ inputs.runtime }} ${{ inputs.version }}!"
