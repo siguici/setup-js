@@ -23,7 +23,7 @@ jobs:
             pm: pnpm
           - runtime: deno
             pm: yarn
-    name: 👷 Panam CI on ${{ matrix.runtime }}-${{ matrix.version }} under ${{ matrix.os }} using ${{ matrix.pm }}
+    name: 👷 CI ${{ matrix.runtime }}@${{ matrix.version }} under ${{ matrix.os }} using ${{ matrix.pm }}
 
     timeout-minutes: 60
 
@@ -37,3 +37,4 @@ jobs:
           runtime: ${{ matrix.runtime }}
           version: ${{ matrix.version }}
           pm: ${{ matrix.pm }}
+          scripts: check,test

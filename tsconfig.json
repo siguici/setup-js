@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "include": ["src"],
+  "include": ["tests", "bin"],
   "exclude": ["node_modules", "dist/**/*"],
   "compilerOptions": {
     "strict": true,
