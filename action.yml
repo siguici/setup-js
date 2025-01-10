@@ -74,24 +74,24 @@ runs:
 
     - name: 📋 Display detected values
       run: |
-        echo "Package Manager: ${{ steps.detect-pm.outputs.pm }}"
-        echo "Version: ${{ steps.detect-pm.outputs.pm_version }}"
-        echo "Lockfile: ${{ steps.detect-pm.outputs.pm_lockfile }}"
+        echo "Package Manager: ${{ env.pm }}"
+        echo "Version: ${{ env.pm_version }}"
+        echo "Lockfile: ${{ env.pm_lockfile }}"
       shell: bash
 
     - name: 📦 Install dependencies
       working-directory: ${{ inputs.cwd }}
       run: |
-        echo "Installing dependencies with ${{ steps.detect-pm.outputs.pm }}"
+        echo "Installing dependencies with ${{ env.pm }}"
         corepack enable
-        if [[ "${{ steps.detect-pm.outputs.pm }}" == "yarn" ]]; then
+        if [[ "${{ env.pm }}" == "yarn" ]]; then
           echo "Yarn detected, preparing package.json..."
-          jq ".packageManager = \"yarn@${{ steps.detect-pm.outputs.pm_version }}\"" package.json > yarn-package.json
+          jq ".packageManager = \"yarn@${{ env.pm_version }}\"" package.json > yarn-package.json
           mv package.json main-package.json
           mv yarn-package.json package.json
         fi
-        corepack prepare ${{ steps.detect-pm.outputs.pm }}@${{ steps.detect-pm.outputs.pm_version }} --activate
-        ${{ steps.detect-pm.outputs.pm }} install
+        corepack prepare ${{ env.pm }}@${{ env.pm_version }} --activate
+        ${{ env.pm }} install
       shell: bash
 
     - name: 🔨 Execute scripts
@@ -104,7 +104,7 @@ runs:
       env:
         scripts: ${{ inputs.scripts }}
         runtime: ${{ inputs.runtime }}
-        pm: ${{ steps.detect-pm.outputs.pm }}
+        pm: ${{ env.pm }}
 
     - name: 🎉 Finish test workflow
       run: echo "🎯 Tests completed for ${{ inputs.runtime }} ${{ inputs.version }}!"
