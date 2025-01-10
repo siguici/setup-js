@@ -87,10 +87,10 @@ runs:
             echo "⚙️ Installing ${{ env.pm }} dependencies"
             corepack enable
             if [[ "${{ env.pm }}" == "yarn" ]]; then
-              if [[ "${{ env.pm_version }}" == "latest" ]]; then
-                pm_version=$(yarn --version)
-              fi
               echo "ℹ️ Yarn detected, preparing package.json..."
+              if [[ "${{ env.pm_version }}" == "latest" ]]; then
+                echo "pm_version=$(yarn --version)" >> $GITHUB_ENV
+              fi
               jq ".packageManager = \"yarn@${{ env.pm_version }}\"" package.json > yarn-package.json
               mv package.json main-package.json
               mv yarn-package.json package.json
