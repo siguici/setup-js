@@ -82,16 +82,39 @@ runs:
     - name: 📦 Install dependencies
       working-directory: ${{ inputs.cwd }}
       run: |
-        echo "Installing dependencies with ${{ env.pm }}"
-        corepack enable
-        if [[ "${{ env.pm }}" == "yarn" ]]; then
-          echo "Yarn detected, preparing package.json..."
-          jq ".packageManager = \"yarn@${{ env.pm_version }}\"" package.json > yarn-package.json
-          mv package.json main-package.json
-          mv yarn-package.json package.json
-        fi
-        corepack prepare ${{ env.pm }}@${{ env.pm_version }} --activate
-        ${{ env.pm }} install
+        case "${{ inputs.runtime }}" in
+          "node")
+            echo "⚙️ Installing ${{ env.pm }} dependencies"
+            corepack enable
+            if [[ "${{ env.pm }}" == "yarn" ]]; then
+              if [[ "${{ env.pm_version }}" == "latest" ]] then
+                pm_version=$(yarn --version)
+              fi
+              echo "ℹ️ Yarn detected, preparing package.json..."
+              jq ".packageManager = \"yarn@${{ env.pm_version }}\"" package.json > yarn-package.json
+              mv package.json main-package.json
+              mv yarn-package.json package.json
+            fi
+            corepack prepare ${{ env.pm }}@${{ env.pm_version }} --activate
+            if [[ "${{ env.pm }}" == "npm" ]]; then
+              npm install --legacy-peer-deps
+            else
+              ${{ env.pm }} install
+            fi
+            ;;
+          "deno")
+            echo "⚙️ Installing Deno dependencies"
+            deno install
+            ;;
+          "bun")
+            echo "⚙️ Installing Bun dependencies"
+            bun install
+            ;;
+          *)
+            echo "❌ Invalid runtime specified: ${{ inputs.runtime }}"
+            exit 1
+            ;;
+        esac
       shell: bash
 
     - name: 🔨 Execute scripts

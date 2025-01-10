@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -z "$GITHUB_ENV" ]; then
-  echo "Error: GITHUB_ENV is not defined. Provide a path to a writable file."
+  echo "❌ GITHUB_ENV is not defined. Provide a path to a writable file."
   exit 1
 fi
 
@@ -12,7 +12,7 @@ if [ -n "$input_pm" ] && [ "${#input_pm}" -gt 1 ]; then
   [ -z "$pm_version" ] && pm_version="latest"
 
   if [[ ! "$pm" =~ ^(npm|yarn|pnpm|bun|deno)$ ]]; then
-    echo "Error: Invalid package manager '$pm'. Valid options are npm, yarn, pnpm, bun, deno."
+    echo "❌ Invalid package manager '$pm'. Valid options are npm, yarn, pnpm, bun, deno."
     exit 1
   fi
 else
