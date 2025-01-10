@@ -89,9 +89,12 @@ runs:
             if [[ "${{ env.pm }}" == "yarn" ]]; then
               echo "ℹ️ Yarn detected, preparing package.json..."
               if [[ "${{ env.pm_version }}" == "latest" ]]; then
-                echo "pm_version=$(yarn --version)" >> $GITHUB_ENV
+                pm_version=$(yarn --version)
+              else
+                pm_version=${{ env.pm_version }}
               fi
-              jq ".packageManager = \"yarn@${{ env.pm_version }}\"" package.json > yarn-package.json
+              echo "ℹ️ Defining the 'packageManager' field to 'yarn@$pm_version'..."
+              jq ".packageManager = \"yarn@$pm_version\"" package.json > yarn-package.json
               mv package.json main-package.json
               mv yarn-package.json package.json
             fi
