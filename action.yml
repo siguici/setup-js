@@ -87,7 +87,7 @@ runs:
             echo "⚙️ Installing ${{ env.pm }} dependencies"
             corepack enable
             if [[ "${{ env.pm }}" == "yarn" ]]; then
-              if [[ "${{ env.pm_version }}" == "latest" ]] then
+              if [[ "${{ env.pm_version }}" == "latest" ]]; then
                 pm_version=$(yarn --version)
               fi
               echo "ℹ️ Yarn detected, preparing package.json..."
