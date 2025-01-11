@@ -1,8 +1,11 @@
 #!/bin/bash
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+source "$SCRIPT_DIR/messages.sh"
+
 if [ -z "$GITHUB_ENV" ]; then
-  echo "❌ GITHUB_ENV is not defined. Provide a path to a writable file."
-  exit 1
+  panic "GITHUB_ENV is not defined. Provide a path to a writable file."
 fi
 
 parse_pm() {
@@ -18,8 +21,7 @@ if [ -n "$input_pm" ] && [ "${#input_pm}" -gt 1 ]; then
   [ -z "$pm_version" ] && pm_version="latest"
 
   if [[ ! "$pm" =~ ^(npm|yarn|pnpm|bun|deno)$ ]]; then
-    echo "❌ Invalid package manager '$pm'. Valid options are npm, yarn, pnpm, bun, deno."
-    exit 1
+    panic "Invalid package manager '$pm'. Valid options are npm, yarn, pnpm, bun, deno."
   fi
 else
   if [ -f "package.json" ]; then
@@ -50,6 +52,8 @@ else
 
   if [ -z "$pm" ]; then
     if [ -z "$runtime" ]; then
+      warning "No runtime provided, runtime detection..."
+
       if command -v bun &>/dev/null; then
         pm="bun"
       elif command -v deno &>/dev/null; then
@@ -74,6 +78,8 @@ else
 
   pm_version=${pm_version:-"latest"}
 fi
+
+info "$pm@$pm_version detected with lockfile $pm_lockfile"
 
 echo "pm=$pm" >> "$GITHUB_ENV"
 echo "pm_version=$pm_version" >> "$GITHUB_ENV"

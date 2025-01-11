@@ -1,26 +1,8 @@
 #!/bin/bash
 
-declare -A script_messages=(
-  ["test"]="🧪 Running tests"
-  ["lint"]="🧐 Linting code"
-  ["format"]="✨ Formatting code"
-  ["check"]="✅ Checking code style"
-  ["build"]="🏗️ Building the project"
-  ["ci"]="💚 Running CI pipeline"
-  ["deploy"]="🚀 Deploying the project"
-  ["release"]="📦 Project release"
-)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-get_script_message() {
-  local script="$1"
-  for key in "${!script_messages[@]}"; do
-    if [[ "$script" == $key || "$script" == $key:* || "$script" == $key.* || "$script" == *:$key || "$script" == *.$key ]]; then
-      echo "${script_messages[$key]} ($script)"
-      return
-    fi
-  done
-  echo "🔨 Running $script"
-}
+source "$SCRIPT_DIR/messages.sh"
 
 IFS=',' read -ra scripts <<< "$scripts"
 
@@ -31,19 +13,18 @@ for script in "${scripts[@]}"; do
   case "$pm" in
   "npm"|"bun")
     $pm run $script
-    echo "ℹ️ $pm run $script executed"
+    success "$pm run $script executed"
     ;;
   "pnpm"|"yarn")
     $pm $script
-    echo "ℹ️ $pm $script executed"
+    success "$pm $script executed"
     ;;
   "deno")
     deno task $script
-    echo "ℹ️ deno task $script executed"
+    success "deno task $script executed"
     ;;
   *)
-    echo "❌ Unknown package manager: $pm"
-    exit 1
+    panic "Unknown package manager: $pm"
     ;;
   esac
 done
