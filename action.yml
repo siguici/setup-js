@@ -28,6 +28,9 @@ inputs:
     default: '.'
 
 outputs:
+  os:
+    description: 'The operating system used'
+    value: ''
   runtime:
     description: 'Runtime used'
     value: ''

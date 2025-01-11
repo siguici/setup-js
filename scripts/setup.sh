@@ -3,6 +3,7 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/utils.sh"
 
+os=${os:-""}
 runtime=${runtime:-""}
 pm=${pm:-""}
 pm_version=${pm_version:-"latest"}
@@ -13,6 +14,28 @@ parse_pm() {
   local name=$(echo "$input" | grep -o '^[^@]*')
   local version=$(echo "$input" | grep -o '@.*' | sed 's/^@//' || echo "latest")
   echo "$name $version"
+}
+
+detect_os() {
+  if [ -z "$os" ]; then
+    case "$OSTYPE" in
+      darwin*) os="macOS" ;;
+      linux-gnu*) os="Linux" ;;
+      msys*|cygwin*|win32*) os="Windows" ;;
+      *) os="Unknown" ;;
+    esac
+  fi
+}
+
+detect_os() {
+  if [ -z "$os" ]; then
+    case "$OSTYPE" in
+      darwin*) os="macOS" ;;
+      linux-gnu*) os="Linux" ;;
+      msys*|cygwin*|win32*) os="Windows" ;;
+      *) os="Unknown" ;;
+    esac
+  fi
 }
 
 detect_runtime() {
@@ -56,8 +79,22 @@ detect_package_manager() {
   pm=${pm:-"npm"}
 }
 
+detect_os
 detect_runtime
 detect_package_manager
+
+case "$os" in
+  "macOS") echo "🍏💻 macOS detected..." ;;
+  "Linux") echo "🐧 Linux detected..." ;;
+  "Windows")
+    if grep -q Microsoft /proc/version 2>/dev/null; then
+      echo "🐧🪟 WSL (Windows Subsystem for Linux) detected"
+    else
+      echo "🪟 Native Windows environment detected"
+    fi
+    ;;
+  *) echo "❓ Unknown OS, type: $OSTYPE" ;;
+esac
 
 if [[ "$pm" == "$runtime" ]]; then
   info "Using $runtime"
@@ -66,6 +103,7 @@ else
 fi
 
 {
+  echo "os=$os"
   echo "runtime=$runtime"
   echo "pm=$pm"
   echo "pm_version=$pm_version"
