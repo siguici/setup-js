@@ -50,9 +50,6 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - name: 🚚 Checkout repository
-      uses: actions/checkout@v4
-
     - name: 🛠️ Prepare the environment
       run: |
         chmod +x "${{ github.action_path }}/scripts/prepare.sh"
