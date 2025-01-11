@@ -1,12 +1,15 @@
 #!/bin/bash
 
+set -euo pipefail
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source "$SCRIPT_DIR/messages.sh"
 
-if [ -z "$GITHUB_ENV" ]; then
-  panic "GITHUB_ENV is not defined. Provide a path to a writable file."
-fi
+runtime=${runtime:-""}
+pm=${pm:-""}
+pm_version=${pm_version:-"latest"}
+pm_lockfile=${pm_lockfile:-"none"}
 
 parse_pm() {
   local input=$1
@@ -15,69 +18,47 @@ parse_pm() {
   echo "$name $version"
 }
 
-if [ -z "$runtime" ]; then
-  warning "No runtime provided, runtime detection..."
-
-  if command -v bun &>/dev/null; then
-    runtime="bun"
-  elif command -v deno &>/dev/null; then
-    runtime="deno"
-  else
-    runtime="node"
+detect_runtime() {
+  if [ -z "$runtime" ]; then
+    if command -v bun &>/dev/null; then
+      runtime="bun"
+    elif command -v deno &>/dev/null; then
+      runtime="deno"
+    else
+      runtime="node"
+    fi
   fi
-fi
+}
 
-if [ -n "$input_pm" ] && [ "${#input_pm}" -gt 1 ]; then
-  read -r pm pm_version <<< "$(parse_pm "$input_pm")"
-
-  [ -z "$pm_version" ] && pm_version="latest"
-
-  if [[ ! "$pm" =~ ^(npm|yarn|pnpm|bun|deno)$ ]]; then
-    panic "Invalid package manager '$pm'. Valid options are npm, yarn, pnpm, bun, deno."
-  fi
-else
-  if [ -f "package.json" ]; then
-    package_manager=$(jq -r '.packageManager // empty' package.json 2>/dev/null)
-    if [ -n "$package_manager" ]; then
-      read -r pm pm_version <<< "$(parse_pm "$package_manager")"
+detect_package_manager() {
+  if [ -n "$pm" ]; then
+    read -r pm pm_version <<< "$(parse_pm "$pm")"
+    [[ -z "$pm_version" ]] && pm_version="latest"
+    valid_pms=("npm" "yarn" "pnpm" "bun" "deno")
+    if [[ ! " ${valid_pms[@]} " =~ " $pm " ]]; then
+      panic "Invalid package manager '$pm'. Valid options are: ${valid_pms[*]}."
+    fi
+  elif [ -f "package.json" ]; then
+    local pkg_manager=$(jq -r '.packageManager // empty' package.json 2>/dev/null || true)
+    if [ -n "$pkg_manager" ]; then
+      read -r pm pm_version <<< "$(parse_pm "$pkg_manager")"
     fi
   fi
 
-  if [ -z "$pm" ]; then
-    if [ -f "pnpm-lock.yaml" ]; then
-      pm="pnpm"
-      pm_lockfile="pnpm-lock.yaml"
-    elif [ -f "yarn.lock" ]; then
-      pm="yarn"
-      pm_lockfile="yarn.lock"
-    elif [ -f "package-lock.json" ]; then
-      pm="npm"
-      pm_lockfile="package-lock.json"
-    elif [ -f "bun.lockb" ]; then
-      pm="bun"
-      pm_lockfile="bun.lockb"
-    elif [ -f "deno.lock" ]; then
-      pm="deno"
-      pm_lockfile="deno.lock"
-    fi
-  fi
+  [ -f "pnpm-lock.yaml" ] && pm="pnpm" && pm_lockfile="pnpm-lock.yaml"
+  [ -f "yarn.lock" ] && pm="yarn" && pm_lockfile="yarn.lock"
+  [ -f "package-lock.json" ] && pm="npm" && pm_lockfile="package-lock.json"
+  [ -f "bun.lockb" ] && pm="bun" && pm_lockfile="bun.lockb"
+  [ -f "deno.lock" ] && pm="deno" && pm_lockfile="deno.lock"
 
-  if [ -z "$pm" ]; then
-    case "$runtime" in
-      "bun")
-        pm="bun"
-        ;;
-      "deno")
-        pm="deno"
-        ;;
-      *)
-        pm="npm"
-        ;;
-    esac
-  fi
+  [[ -z "$pm" ]] && [[ "$runtime" == 'bun' ]] && pm="bun"
+  [[ -z "$pm" ]] && [[ "$runtime" == 'deno' ]] && pm="deno"
 
-  pm_version=${pm_version:-"latest"}
-fi
+  pm=${pm:-"npm"}
+}
+
+detect_runtime
+detect_package_manager
 
 version=$($runtime --version)
 
@@ -87,8 +68,10 @@ else
   info "$pm@$pm_version detected with lockfile $pm_lockfile under $runtime@$version"
 fi
 
-echo "runtime=$runtime" >> "$GITHUB_ENV"
-echo "version=$version" >> "$GITHUB_ENV"
-echo "pm=$pm" >> "$GITHUB_ENV"
-echo "pm_version=$pm_version" >> "$GITHUB_ENV"
-echo "pm_lockfile=${pm_lockfile:-none}" >> "$GITHUB_ENV"
+{
+  echo "runtime=$runtime"
+  echo "version=$version"
+  echo "pm=$pm"
+  echo "pm_version=$pm_version"
+  echo "pm_lockfile=$pm_lockfile"
+} >> "$GITHUB_ENV"

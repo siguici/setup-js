@@ -57,7 +57,7 @@ runs:
         chmod +x "${{ github.action_path }}/scripts/setup.sh"
         bash "${{ github.action_path }}/scripts/setup.sh"
       env:
-        input_pm: ${{ inputs.pm }}
+        pm: ${{ inputs.pm }}
         runtime: ${{ inputs.runtime }}
         GITHUB_ENV: $GITHUB_ENV
       shell: bash
