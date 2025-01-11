@@ -50,6 +50,13 @@ runs:
     - name: 🚚 Checkout repository
       uses: actions/checkout@v4
 
+    - name: ⬆️Update Bash
+      run: |
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        brew install bash
+        echo "Bash version: $(bash --version)"
+      shell: bash
+
     - name: 🔍 Detect package manager
       id: detect-pm
       working-directory: ${{ inputs.cwd }}
