@@ -13,8 +13,7 @@ fi
 IFS=',' read -ra scripts <<< "$scripts"
 
 for script in "${scripts[@]}"; do
-  message=$(get_script_message "$script")
-  echo "$message..."
+  message $script
 
   case "$pm" in
   "npm"|"bun")
@@ -34,4 +33,3 @@ for script in "${scripts[@]}"; do
     ;;
   esac
 done
-
