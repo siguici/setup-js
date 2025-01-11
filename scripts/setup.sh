@@ -15,6 +15,18 @@ parse_pm() {
   echo "$name $version"
 }
 
+if [ -z "$runtime" ]; then
+  warning "No runtime provided, runtime detection..."
+
+  if command -v bun &>/dev/null; then
+    runtime="bun"
+  elif command -v deno &>/dev/null; then
+    runtime="deno"
+  else
+    runtime="node"
+  fi
+fi
+
 if [ -n "$input_pm" ] && [ "${#input_pm}" -gt 1 ]; then
   read -r pm pm_version <<< "$(parse_pm "$input_pm")"
 
@@ -51,18 +63,6 @@ else
   fi
 
   if [ -z "$pm" ]; then
-    if [ -z "$runtime" ]; then
-      warning "No runtime provided, runtime detection..."
-
-      if command -v bun &>/dev/null; then
-        pm="bun"
-      elif command -v deno &>/dev/null; then
-        pm="deno"
-      else
-        pm="node"
-      fi
-    fi
-
     case "$runtime" in
       "bun")
         pm="bun"
@@ -79,8 +79,16 @@ else
   pm_version=${pm_version:-"latest"}
 fi
 
-info "$pm@$pm_version detected with lockfile $pm_lockfile"
+version=$($runtime --version)
 
+if [[ "$pm" == "$runtime" ]]; then
+  info "Using $runtime@$version"
+else
+  info "$pm@$pm_version detected with lockfile $pm_lockfile under $runtime@$version"
+fi
+
+echo "runtime=$runtime" >> "$GITHUB_ENV"
+echo "version=$version" >> "$GITHUB_ENV"
 echo "pm=$pm" >> "$GITHUB_ENV"
 echo "pm_version=$pm_version" >> "$GITHUB_ENV"
 echo "pm_lockfile=${pm_lockfile:-none}" >> "$GITHUB_ENV"

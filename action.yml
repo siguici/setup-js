@@ -28,6 +28,12 @@ inputs:
     default: '.'
 
 outputs:
+  runtime:
+    description: 'Runtime used'
+    value: ''
+  version:
+    description: 'Version of the runtime used'
+    value: ''
   pm:
     description: 'Detected package manager'
     value: ''
