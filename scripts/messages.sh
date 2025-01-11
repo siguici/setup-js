@@ -1,15 +1,7 @@
 #!/usr/bin/env bash
 
-if ((BASH_VERSINFO[0] < 4)); then
-  echo "This script requires Bash 4.0 or higher." >&2
-  exit 1
-fi
-
-set -euo pipefail
-
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  set +u
-fi
+set -eEuo pipefail
+trap 's=$?; echo >&2 "$0: $BASH_COMMAND error on line $LINENO"; exit $s' ERR
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
