@@ -53,9 +53,8 @@ detect_package_manager() {
       ;;
   esac
 
-  [[ -z "$pm" && "$runtime" == 'bun' ]] && pm="bun"
-  [[ -z "$pm" && "$runtime" == 'deno' ]] && pm="deno"
-
+  pm="${pm:-$runtime}"
+  pm="${pm//node/npm}"
   pm=${pm:-"npm"}
 }
 
