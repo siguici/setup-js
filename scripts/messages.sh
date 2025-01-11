@@ -39,16 +39,8 @@ panic() {
   exit "${2:-1}"
 }
 
-ensure_var_exists() {
-  if [ -z "${1:-}" ]; then
-    panic "Undefined or empty variable"
-  fi
-}
-
 get_message() {
   local script="$1"
-
-  ensure_var_exists script;
 
   for key in "${!script_messages[@]}"; do
     if [[ "$script" == $key || "$script" == $key:* || "$script" == $key.* || "$script" == *:$key || "$script" == *.$key ]]; then
