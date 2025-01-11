@@ -50,8 +50,13 @@ runs:
     - name: 🚚 Checkout repository
       uses: actions/checkout@v4
 
+    - name: 🛠️ Prepare the environment
+      run: |
+        chmod +x "${{ github.action_path }}/scripts/prepare.sh"
+        bash "${{ github.action_path }}/scripts/prepare.sh"
+      shell: bash
+
     - name: 🔍 Detect package manager
-      id: detect-pm
       working-directory: ${{ inputs.cwd }}
       run: |
         chmod +x "${{ github.action_path }}/scripts/setup.sh"
