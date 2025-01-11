@@ -3,7 +3,6 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
 source "$SCRIPT_DIR/messages.sh"
 
 runtime=${runtime:-""}
@@ -33,7 +32,6 @@ detect_runtime() {
 detect_package_manager() {
   if [ -n "$pm" ]; then
     read -r pm pm_version <<< "$(parse_pm "$pm")"
-    [[ -z "$pm_version" ]] && pm_version="latest"
     valid_pms=("npm" "yarn" "pnpm" "bun" "deno")
     if [[ ! " ${valid_pms[@]} " =~ " $pm " ]]; then
       panic "Invalid package manager '$pm'. Valid options are: ${valid_pms[*]}."
@@ -45,14 +43,18 @@ detect_package_manager() {
     fi
   fi
 
-  [ -f "pnpm-lock.yaml" ] && pm="pnpm" && pm_lockfile="pnpm-lock.yaml"
-  [ -f "yarn.lock" ] && pm="yarn" && pm_lockfile="yarn.lock"
-  [ -f "package-lock.json" ] && pm="npm" && pm_lockfile="package-lock.json"
-  [ -f "bun.lockb" ] && pm="bun" && pm_lockfile="bun.lockb"
-  [ -f "deno.lock" ] && pm="deno" && pm_lockfile="deno.lock"
+  case "$pm" in
+    "" )
+      [ -f "pnpm-lock.yaml" ] && pm="pnpm" && pm_lockfile="pnpm-lock.yaml"
+      [ -f "yarn.lock" ] && pm="yarn" && pm_lockfile="yarn.lock"
+      [ -f "package-lock.json" ] && pm="npm" && pm_lockfile="package-lock.json"
+      [ -f "bun.lockb" ] && pm="bun" && pm_lockfile="bun.lockb"
+      [ -f "deno.lock" ] && pm="deno" && pm_lockfile="deno.lock"
+      ;;
+  esac
 
-  [[ -z "$pm" ]] && [[ "$runtime" == 'bun' ]] && pm="bun"
-  [[ -z "$pm" ]] && [[ "$runtime" == 'deno' ]] && pm="deno"
+  [[ -z "$pm" && "$runtime" == 'bun' ]] && pm="bun"
+  [[ -z "$pm" && "$runtime" == 'deno' ]] && pm="deno"
 
   pm=${pm:-"npm"}
 }
