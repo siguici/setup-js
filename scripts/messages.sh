@@ -11,8 +11,18 @@ declare -A script_messages=(
   ["release"]="📦 Project release"
 )
 
+isset() {
+  if [ -z "${1:-}" ]; then
+    echo "Undefined or empty variable" >&2
+    return 1
+  fi
+}
+
 get_script_message() {
   local script="$1"
+  if ! isset "$script"; then
+    return 1
+  fi
   for key in "${!script_messages[@]}"; do
     if [[ "$script" == $key || "$script" == $key:* || "$script" == $key.* || "$script" == *:$key || "$script" == *.$key ]]; then
       echo "${script_messages[$key]} ($script)"
