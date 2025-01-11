@@ -61,17 +61,14 @@ detect_package_manager() {
 detect_runtime
 detect_package_manager
 
-version=$($runtime --version)
-
 if [[ "$pm" == "$runtime" ]]; then
-  info "Using $runtime@$version"
+  info "Using $runtime"
 else
-  info "$pm@$pm_version detected with lockfile $pm_lockfile under $runtime@$version"
+  info "$pm@$pm_version detected with lockfile $pm_lockfile under $runtime"
 fi
 
 {
   echo "runtime=$runtime"
-  echo "version=$version"
   echo "pm=$pm"
   echo "pm_version=$pm_version"
   echo "pm_lockfile=$pm_lockfile"
