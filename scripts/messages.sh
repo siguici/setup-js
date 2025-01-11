@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if ((BASH_VERSINFO[0] < 4)); then
+  echo "This script requires Bash 4.0 or higher." >&2
+  exit 1
+fi
+
 set -euo pipefail
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
