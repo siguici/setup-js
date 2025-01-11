@@ -103,5 +103,7 @@ runs:
       shell: bash
 
     - name: 🎉 Finish test workflow
-      run: echo "🎯 Tests completed for ${{ inputs.runtime }} ${{ inputs.version }}!"
+      run: |
+        echo "🎯 Setup completed for ${{ inputs.runtime }}@${{ inputs.version }}!"
+        echo "${{ env.pm }}@${{ env.pm_version }} was used as dependency manager 📦️"
       shell: bash
