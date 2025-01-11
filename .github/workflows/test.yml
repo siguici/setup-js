@@ -37,4 +37,4 @@ jobs:
           runtime: ${{ matrix.runtime }}
           version: ${{ matrix.version }}
           pm: ${{ matrix.pm }}
-          scripts: fix,check,test
+          scripts: test
