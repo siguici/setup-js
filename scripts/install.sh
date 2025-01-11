@@ -16,7 +16,7 @@ if ! command -v jq &> /dev/null; then
   panic "jq is not installed. Please install it and try again."
 fi
 
-echo "⚙️ Installing $pm dependencies"
+echo -e "⚙️ Installing $pm dependencies"
 
 if [[ "${runtime}" == "node" ]]; then
   corepack enable || panic "Failed to enable Corepack."

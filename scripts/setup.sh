@@ -84,16 +84,16 @@ detect_runtime
 detect_package_manager
 
 case "$os" in
-  "macOS") echo "🍏💻 macOS detected..." ;;
-  "Linux") echo "🐧 Linux detected..." ;;
+  "macOS") echo -e "$MACOS detected..." ;;
+  "Linux") echo -e "$LINUX detected..." ;;
   "Windows")
     if grep -q Microsoft /proc/version 2>/dev/null; then
-      echo "🐧🪟 WSL (Windows Subsystem for Linux) detected"
+      echo -e "$WINDOWS Subsystem for $LINUX (WSL) detected"
     else
-      echo "🪟 Native Windows environment detected"
+      echo -e "$WINDOWS detected"
     fi
     ;;
-  *) echo "❓ Unknown OS, type: $OSTYPE" ;;
+  *) echo -e "$UNKNOWN OS, type: $OSTYPE" ;;
 esac
 
 if [[ "$pm" == "$runtime" ]]; then

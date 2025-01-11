@@ -29,7 +29,7 @@ log() {
     WARNING) echo -e "⚠️ $message" >&2 ;;
     ERROR) echo -e "❌ $message" >&2 ;;
     SUCCESS) echo -e "✔  $message" ;;
-    *) echo "🚫 Unknown log level: $level" >&2 ;;
+    *) echo -e "🚫 Unknown log level: $level" >&2 ;;
   esac
 }
 
