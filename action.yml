@@ -48,8 +48,8 @@ runs:
       id: detect-pm
       working-directory: ${{ inputs.cwd }}
       run: |
-        chmod +x "${{ github.action_path }}/scripts/pm.sh"
-        bash "${{ github.action_path }}/scripts/pm.sh"
+        chmod +x "${{ github.action_path }}/scripts/setup.sh"
+        bash "${{ github.action_path }}/scripts/setup.sh"
       env:
         input_pm: ${{ inputs.pm }}
         runtime: ${{ inputs.runtime }}
@@ -84,30 +84,11 @@ runs:
     - name: 📦 Install dependencies
       working-directory: ${{ inputs.cwd }}
       run: |
-        if [[ "${{ inputs.runtime }}" == "node" ]]; then
-          echo "⚙️ Installing ${{ env.pm }} dependencies"
-          corepack enable
-          if [[ "${{ env.pm }}" == "yarn" ]]; then
-            echo "ℹ️ Yarn detected, preparing package.json..."
-            if [[ "${{ env.pm_version }}" == "latest" ]]; then
-              pm_version=$(yarn --version)
-            else
-              pm_version=${{ env.pm_version }}
-            fi
-            echo "ℹ️ Defining the 'packageManager' field to 'yarn@$pm_version'..."
-            jq ".packageManager = \"yarn@$pm_version\"" package.json > yarn-package.json
-            mv package.json main-package.json
-            mv yarn-package.json package.json
-          fi
-          corepack prepare ${{ env.pm }}@${{ env.pm_version }} --activate
-          if [[ "${{ env.pm }}" == "npm" ]]; then
-            npm install --legacy-peer-deps
-          else
-            ${{ env.pm }} install
-          fi
-        else
-          ${{ env.pm }} install
-        fi
+        chmod +x "${{ github.action_path }}/scripts/install.sh"
+        bash "${{ github.action_path }}/scripts/install.sh"
+      env:
+        pm: ${{ env.pm }}
+        runtime: ${{ inputs.runtime }}
       shell: bash
 
     - name: 🔨 Execute scripts
@@ -116,10 +97,10 @@ runs:
       run: |
         chmod +x "${{ github.action_path }}/scripts/run.sh"
         bash "${{ github.action_path }}/scripts/run.sh"
-      shell: bash
       env:
         scripts: ${{ inputs.scripts }}
         pm: ${{ env.pm }}
+      shell: bash
 
     - name: 🎉 Finish test workflow
       run: echo "🎯 Tests completed for ${{ inputs.runtime }} ${{ inputs.version }}!"
