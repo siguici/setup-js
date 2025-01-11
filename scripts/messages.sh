@@ -1,5 +1,11 @@
 #!/bin/bash
 
+set -euo pipefail
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  set +u
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source "$SCRIPT_DIR/messages.ini"
