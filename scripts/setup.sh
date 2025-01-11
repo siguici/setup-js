@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 
-set -eEuo pipefail
-trap 's=$?; echo >&2 "$0: $BASH_COMMAND error on line $LINENO"; exit $s' ERR
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/messages.sh"
+source "$SCRIPT_DIR/utils.sh"
 
 runtime=${runtime:-""}
 pm=${pm:-""}
