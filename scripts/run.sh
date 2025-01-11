@@ -6,6 +6,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source "$SCRIPT_DIR/messages.sh"
 
+if [ -z "${scripts:-}" ]; then
+  panic "No scripts provided"
+fi
+
 IFS=',' read -ra scripts <<< "$scripts"
 
 for script in "${scripts[@]}"; do
