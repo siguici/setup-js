@@ -63,7 +63,6 @@ runs:
         bash "${{ github.action_path }}/scripts/setup.sh"
       env:
         pm: ${{ inputs.pm }}
-        cwd: ${{ inputs.cwd }}
         runtime: ${{ inputs.runtime }}
         GITHUB_ENV: $GITHUB_ENV
       shell: bash
@@ -83,12 +82,18 @@ runs:
         package_json_file: "${{ inputs.cwd }}/package.json"
 
     - name: 🐳 Set up Node.js
-      if: ${{ inputs.runtime == 'node' || env.pm == 'npm' || env.pm == 'pnpm' || env.pm == 'yarn' }}
+      if: ${{ (inputs.runtime == 'node' || env.pm == 'npm' || env.pm == 'pnpm' || env.pm == 'yarn') && env.pm_lockfile }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.version }}
         cache: ${{ env.pm }}
         cache-dependency-path: ${{ env.pm_lockfile }}
+
+    - name: 🐳 Set up Node.js
+      if: ${{ inputs.runtime == 'node' || env.pm == 'npm' || env.pm == 'pnpm' || env.pm == 'yarn' }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.version }}
 
     - name: 🦕 Set up Deno
       if: ${{ inputs.runtime == 'deno' || env.pm == 'deno' }}
