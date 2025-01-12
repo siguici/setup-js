@@ -104,7 +104,11 @@ detect_os() {
       os_version=$(grep '^VERSION_ID=' /etc/os-release | cut -d '=' -f 2 | tr -d '"')
     else
       os_name=${os_name:-"Generic"}
-      os_version=$(lsb_release -rs 2>/dev/null || echo "$(uname -r)")
+      if command -v lsb_release >/dev/null 2>&1; then
+        os_version=$(lsb_release -rs 2>/dev/null || echo "$(uname -r)")
+      else
+        os_version=$(cat /etc/issue | grep -oP 'Ubuntu \K[0-9]+\.[0-9]+' 2>/dev/null || echo "$(uname -r)")
+      fi
     fi
   elif [[ "$os" == "windows" ]]; then
     os_name=${os_name:-"Windows"}
