@@ -2,7 +2,7 @@ name: Setup JavaScript/TypeScript Environment
 
 branding:
   icon: settings
-  color: yellow
+  color: blue
 
 description: |
   This action sets up the runtime, installs dependencies, and runs scripts for Node.js, Deno, or Bun.
