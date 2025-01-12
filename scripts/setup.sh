@@ -4,6 +4,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/utils.sh"
 
 runtime=${runtime:-""}
+cwd=${cwd:-"."}
 pm=${pm:-""}
 pm_version=${pm_version:-"latest"}
 pm_lockfile=${pm_lockfile:-"none"}
@@ -58,6 +59,12 @@ detect_pm() {
   pm="${pm:-$runtime}"
   pm="${pm//node/npm}"
   pm=${pm:-"npm"}
+
+  if [[ -n "$pm_lockfile" && "$pm_lockfile" != "none" ]]; then
+    pm_lockfile="$cwd/$pm_lockfile"
+  else
+    pm_lockfile=""
+  fi
 }
 
 normalize_arch() {
@@ -145,7 +152,11 @@ detect_os
 if [[ "$pm" == "$runtime" ]]; then
   info "Using $runtime"
 else
-  info "$pm@$pm_version detected with lockfile $pm_lockfile under $runtime"
+  info "$pm@$pm_version under $runtime"
+fi
+
+if [ -n "$pm_lockfile" ]; then
+  info "Lockfile: $pm_lockfile"
 fi
 
 os_info

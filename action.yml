@@ -63,6 +63,7 @@ runs:
         bash "${{ github.action_path }}/scripts/setup.sh"
       env:
         pm: ${{ inputs.pm }}
+        cwd: ${{ inputs.cwd }}
         runtime: ${{ inputs.runtime }}
         GITHUB_ENV: $GITHUB_ENV
       shell: bash
@@ -80,7 +81,7 @@ runs:
       with:
         node-version: ${{ inputs.version }}
         cache: ${{ env.pm }}
-        cache-dependency-path: ${{ env.pm_lockfile != '' && env.pm_lockfile != 'none' && env.pm_lockfile != null ? inputs.cwd + '/' + env.pm_lockfile : '' }}
+        cache-dependency-path: ${{ env.pm_lockfile }}
 
     - name: 📦 Setup PNPM
       if: ${{ env.pm == 'pnpm' }}
