@@ -138,7 +138,7 @@ main() {
   os=$(detect_os)
   echo -e "💻 Detected system: $os"
 
-  install_dependencies curl jq
+  install_dependencies curl jq awk
 
   if ((BASH_VERSINFO[0] < 4)); then
     echo -e "🔄 Updating Bash to version 4+..."
