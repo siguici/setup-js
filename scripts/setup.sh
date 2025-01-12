@@ -150,13 +150,17 @@ fi
 
 os_info
 
-{
-  echo "runtime=$runtime"
-  echo "pm=$pm"
-  echo "pm_version=$pm_version"
-  echo "pm_lockfile=$pm_lockfile"
-  echo "os=$os"
-  echo "os_name=$os_name"
-  echo "os_version=$os_version"
-  echo "os_arch=$os_arch"
-} >> "$GITHUB_ENV"
+if [[ -w "$GITHUB_ENV" ]]; then
+  {
+    echo "runtime=$runtime"
+    echo "pm=$pm"
+    echo "pm_version=$pm_version"
+    echo "pm_lockfile=$pm_lockfile"
+    echo "os=$os"
+    echo "os_name=$os_name"
+    echo "os_version=$os_version"
+    echo "os_arch=$os_arch"
+  } >> "$GITHUB_ENV"
+else
+  panic "Failed to write to $GITHUB_ENV."
+fi
