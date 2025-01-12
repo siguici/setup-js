@@ -75,10 +75,19 @@ runs:
       shell: bash
 
     - name: 🐳 Set up Node.js
-      if: ${{ inputs.runtime == 'node' }}
+      if: ${{ inputs.runtime == 'node' || env.pm == 'npm'  || env.pm == 'pnpm'  || env.pm == 'yarn' }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.version }}
+        cache: ${{ env.pm }}
+        cache-dependency-path: "${{ inputs.cwd }}/${{ env.pm_lockfile }}"
+
+    - name: 📦 Setup PNPM
+      if: ${{ env.pm == 'pnpm' }}
+      uses: pnpm/action-setup@v4
+      with:
+        version: ${{ env.pm_version }}
+        package_json_file: "${{ inputs.cwd }}/package.json"
 
     - name: 🦕 Set up Deno
       if: ${{ inputs.runtime == 'deno' || env.pm == 'deno' }}
@@ -92,7 +101,7 @@ runs:
       with:
         bun-version: ${{ inputs.version }}
 
-    - name: 📦 Install dependencies
+    - name: 📥 Install dependencies
       working-directory: ${{ inputs.cwd }}
       run: |
         chmod +x "${{ github.action_path }}/scripts/install.sh"
