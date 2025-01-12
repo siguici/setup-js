@@ -28,9 +28,6 @@ inputs:
     default: '.'
 
 outputs:
-  os:
-    description: 'The operating system used'
-    value: ''
   runtime:
     description: 'Runtime used'
     value: ''
@@ -45,6 +42,18 @@ outputs:
     value: ''
   pm_lockfile:
     description: 'Detected lockfile'
+    value: ''
+  os:
+    description: 'The operating system used'
+    value: ''
+  os_name:
+    description: 'The name of the operating system'
+    value: ''
+  os_version:
+    description: 'The version of the operating system'
+    value: ''
+  os_arch:
+    description: 'The architecture of the operating system'
     value: ''
 
 runs:

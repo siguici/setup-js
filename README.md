@@ -21,32 +21,32 @@ for the specified runtime
 
 ## 🛠️ Inputs
 
-- `runtime` (optional)
+- **runtime** (optional)
 
   - Description: The runtime to use.
   - Default: `node`
   - Options: `node`, `deno`, `bun`
   - Example: `deno`
 
-- `version` (optional)
+- **version** (optional)
 
   - Description: The version of the runtime to use.
   - Default: latest
   - Example: 22.12.0
 
-- `pm` (optional)
+- **pm** (optional)
 
   - Description: The package manager to use.
   - Default: [Automatically detected](#-package-manager-detection)
   - Options: `npm`, `yarn`, `pnpm`
   - Example: `yarn`
 
-- `scripts` (optional)
+- **scripts** (optional)
 
   - Description: A comma-separated list of scripts to run in order.
   - Example: `check,build,test,deploy`
 
-- `cwd` (optional)
+- **cwd** (optional)
 
   - Description: The directory in which to execute the commands.
   - Default: `.`
@@ -54,8 +54,37 @@ for the specified runtime
 
 ## 🚚 Outputs
 
-This action does not produce any outputs directly
-but runs scripts based on the provided configuration.
+- **runtime**
+  - Description: The runtime used.
+  - Example: `node`, `deno`, `bun`
+
+- **pm**
+  - Description: The package manager used.
+  - Example: `npm`, `yarn`, `pnpm`
+
+- **pm_version**
+  - Description: The version of the package manager used.
+  - Example: `6.14.8` (npm), `1.22.10` (yarn), `7.0.0` (pnpm)
+
+- **pm_lockfile**
+  - Description: The detected lockfile, if any.
+  - Example: `package-lock.json` (npm), `yarn.lock` (yarn), `pnpm-lock.yaml` (pnpm)
+
+- **os**
+  - Description: The operating system used.
+  - Example: `linux`, `darwin`, `windows`
+
+- **os_name**
+  - Description: The name of the operating system.
+  - Example: `Ubuntu`, `macOS`, `Windows`
+
+- **os_version**
+  - Description: The version of the operating system.
+  - Example: `20.04` (Ubuntu), `11.3` (macOS), `10.0.18363` (Windows)
+
+- **os_arch**
+  - Description: The architecture of the operating system.
+  - Example: `x64`, `x86`, `arm64`
 
 ### 🧑‍💻 Usage
 
