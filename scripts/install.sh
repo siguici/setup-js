@@ -44,6 +44,8 @@ if [[ "${runtime}" == "node" ]]; then
   else
     $pm install || panic "$pm install failed."
   fi
+elif [[ "$pm" == "deno" ]]; then
+  deno install -A || panic "'deno install -A' failed"
 else
-  $pm install || panic "$pm install failed."
+  $pm install || panic "'$pm install' failed."
 fi
