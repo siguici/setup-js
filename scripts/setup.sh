@@ -85,14 +85,14 @@ detect_os() {
 os_info(){
   case "$os" in
     "macOS") OS="$MACOS" ;;
-    "Linux") OS="$LINUX" ;;
-    "Windows")
-      if grep -q Microsoft /proc/version 2>/dev/null; then
+    "Linux")
+      if grep -qi microsoft /proc/version 2>/dev/null; then
         OS="$WINDOWS Subsystem for $LINUX (WSL)"
       else
-        OS="$WINDOWS"
+        OS="$LINUX"
       fi
       ;;
+    "Windows") OS="$WINDOWS" ;;
     *) OS="$UNKNOWN OS, type: $OSTYPE" ;;
   esac
 
