@@ -75,6 +75,13 @@ runs:
         echo "Lockfile: ${{ env.pm_lockfile }}"
       shell: bash
 
+    - name: 📦 Setup PNPM
+      if: ${{ env.pm == 'pnpm' }}
+      uses: pnpm/action-setup@v4
+      with:
+        version: ${{ env.pm_version }}
+        package_json_file: "${{ inputs.cwd }}/package.json"
+
     - name: 🐳 Set up Node.js
       if: ${{ inputs.runtime == 'node' || env.pm == 'npm' || env.pm == 'pnpm' || env.pm == 'yarn' }}
       uses: actions/setup-node@v4
@@ -82,13 +89,6 @@ runs:
         node-version: ${{ inputs.version }}
         cache: ${{ env.pm }}
         cache-dependency-path: ${{ env.pm_lockfile }}
-
-    - name: 📦 Setup PNPM
-      if: ${{ env.pm == 'pnpm' }}
-      uses: pnpm/action-setup@v4
-      with:
-        version: ${{ env.pm_version }}
-        package_json_file: "${{ inputs.cwd }}/package.json"
 
     - name: 🦕 Set up Deno
       if: ${{ inputs.runtime == 'deno' || env.pm == 'deno' }}
