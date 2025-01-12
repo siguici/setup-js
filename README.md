@@ -136,18 +136,8 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         experimental: [false]
         runtime: [node, deno, bun]
-        version: ["latest"]
         pm: [npm, pnpm, yarn]
-        exclude:
-          - runtime: bun
-            pm: pnpm
-          - runtime: bun
-            pm: yarn
-          - runtime: deno
-            pm: pnpm
-          - runtime: deno
-            pm: yarn
-    name: 👷 CI ${{ matrix.runtime }}@${{ matrix.version }} under ${{ matrix.os }} using ${{ matrix.pm }}
+    name: 👷 CI ${{ matrix.runtime }} on ${{ matrix.os }} with ${{ matrix.pm }}
 
     timeout-minutes: 60
 
@@ -159,7 +149,6 @@ jobs:
         uses: @siguici/setup-js@v1
         with:
           runtime: ${{ matrix.runtime }}
-          version: ${{ matrix.version }}
           pm: ${{ matrix.pm }}
           scripts: check,build,test
 ```
