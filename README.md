@@ -19,6 +19,33 @@ for the specified runtime
 
 ---
 
+## 🧑‍💻 Usage
+
+Add this action to your GitHub workflow file:
+
+```yaml
+name: Set up JavaScript/TypeScript environment
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up the environment
+        uses: @siguici/setup-js@v1
+```
+
 ## 🛠️ Inputs
 
 - **runtime** (optional)
@@ -85,33 +112,6 @@ for the specified runtime
 - **os_arch**
   - Description: The architecture of the operating system.
   - Example: `x64`, `x86`, `arm64`
-
-### 🧑‍💻 Usage
-
-Add this action to your GitHub workflow file:
-
-```yaml
-name: Set up JavaScript/TypeScript environment
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
-jobs:
-  setup:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up the environment
-        uses: @siguici/setup-js@v1
-```
 
 In this example, the action sets up the Node.js environment with version 14.17.0
 and installs dependencies using yarn.
