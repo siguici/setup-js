@@ -75,12 +75,12 @@ runs:
       shell: bash
 
     - name: 🐳 Set up Node.js
-      if: ${{ inputs.runtime == 'node' || env.pm == 'npm'  || env.pm == 'pnpm'  || env.pm == 'yarn' }}
+      if: ${{ inputs.runtime == 'node' || env.pm == 'npm' || env.pm == 'pnpm' || env.pm == 'yarn' }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.version }}
         cache: ${{ env.pm }}
-        cache-dependency-path: "${{ inputs.cwd }}/${{ env.pm_lockfile }}"
+        cache-dependency-path: ${{ env.pm_lockfile != '' && env.pm_lockfile != 'none' && env.pm_lockfile != null ? inputs.cwd + '/' + env.pm_lockfile : '' }}
 
     - name: 📦 Setup PNPM
       if: ${{ env.pm == 'pnpm' }}
