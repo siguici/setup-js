@@ -79,28 +79,54 @@ detect_package_manager() {
   pm=${pm:-"npm"}
 }
 
+os_info(){
+  case "$os" in
+    "macOS")
+      echo -e "$MACOS detected..."
+      echo "System Name: $(sw_vers -productName)"
+      echo "macOS Version: $(sw_vers -productVersion)"
+      echo "System Architecture: $(uname -m)"
+      echo "Kernel Name: $(uname -s)"
+      echo "Kernel Version: $(uname -r)"
+      echo "Machine Name: $(hostname)"
+      system_profiler SPHardwareDataType
+      ;;
+    "Linux")
+      echo -e "$LINUX detected..."
+      echo "Operating System Name: $(uname)"
+      echo "Kernel Version: $(uname -r)"
+      echo "System Architecture: $(uname -m)"
+      echo "OS Name: $(lsb_release -d | cut -f2)"
+      echo "Distribution: $(lsb_release -i | cut -f2)"
+      echo "Distribution Version: $(lsb_release -r | cut -f2)"
+      echo "Machine Name: $(hostname)"
+      lscpu
+      ;;
+    "Windows")
+      if grep -q Microsoft /proc/version 2>/dev/null; then
+        echo -e "$WINDOWS Subsystem for $LINUX (WSL) detected..."
+      else
+        echo -e "$WINDOWS detected..."
+      fi
+      powershell -Command "Get-CimInstance -Class Win32_OperatingSystem | Select-Object Caption, Version, Architecture"
+      echo "Machine Name: $(hostname)"
+      powershell -Command "Get-CimInstance -Class Win32_Processor | Select-Object Name, Manufacturer"
+      ;;
+    *) echo -e "$UNKNOWN OS, type: $OSTYPE" ;;
+  esac
+}
+
 detect_os
 detect_runtime
 detect_package_manager
-
-case "$os" in
-  "macOS") echo -e "$MACOS detected..." ;;
-  "Linux") echo -e "$LINUX detected..." ;;
-  "Windows")
-    if grep -q Microsoft /proc/version 2>/dev/null; then
-      echo -e "$WINDOWS Subsystem for $LINUX (WSL) detected"
-    else
-      echo -e "$WINDOWS detected"
-    fi
-    ;;
-  *) echo -e "$UNKNOWN OS, type: $OSTYPE" ;;
-esac
 
 if [[ "$pm" == "$runtime" ]]; then
   info "Using $runtime"
 else
   info "$pm@$pm_version detected with lockfile $pm_lockfile under $runtime"
 fi
+
+os_info
 
 {
   echo "os=$os"
