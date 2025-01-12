@@ -1,6 +1,6 @@
 {
   "name": "setup-js",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "GitHub Action to set up JavaScript/TypeScript environments by installing dependencies",
   "keywords": [
     "github-action",
