@@ -3,62 +3,19 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/utils.sh"
 
-os=${os:-""}
-os_version=${os_version:-""}
-os_architecture=${os_architecture:-""}
-os_cpu=${os_cpu:-""}
-os_kernel=${os_kernel:-""}
-os_hostname=${os_hostname:-""}
-os_uptime=${os_uptime:-""}
 runtime=${runtime:-""}
 pm=${pm:-""}
 pm_version=${pm_version:-"latest"}
 pm_lockfile=${pm_lockfile:-"none"}
+os=${os:-""}
+os_version=${os_version:-""}
+os_arch=${os_arch:-""}
 
 parse_pm() {
   local input=$1
   local name=$(echo "$input" | grep -o '^[^@]*')
   local version=$(echo "$input" | grep -o '@.*' | sed 's/^@//' || echo "latest")
   echo "$name $version"
-}
-
-detect_os() {
-  if [ -z "$os" ]; then
-    case "$OSTYPE" in
-      darwin*)
-        os="macOS"
-        os_version=$(sw_vers -productVersion)
-        os_cpu=$(sysctl -n machdep.cpu.brand_string)
-      ;;
-      linux-gnu*)
-        os="Linux"
-        os_version=$(lsb_release -rs 2>/dev/null || echo "$(uname -r)")
-        os_cpu=$(lscpu | grep 'Model name' | cut -d ':' -f2 | xargs)
-      ;;
-      msys*|cygwin*|win32*)
-        os="Windows"
-        os_version=$(powershell -Command "(Get-CimInstance -Class Win32_OperatingSystem).Version")
-        os_cpu=$(powershell -Command "(Get-CimInstance -Class Win32_Processor).Name")
-      ;;
-      *)
-        os="Unknown"
-        os_version="Unknown"
-        os_cpu="Unknown"
-      ;;
-    esac
-
-    if [[ "$os" == "macOS" || "$os" == "Linux" ]]; then
-      os_uptime=$(cat /proc/uptime 2>/dev/null | awk '{print $1}' || uptime | awk -F'( |,|:)+' '{print $3*3600 + $4*60 + $5}')
-    elif [[ "$os" == "Windows" ]]; then
-      os_uptime=$(powershell -Command "(Get-CimInstance -Class Win32_OperatingSystem).LastBootUpTime")
-    else
-      echo "Unknown"
-    fi
-
-    os_architecture=$(uname -m)
-    os_kernel=$(uname -s)$(uname -r)
-    os_hostname=$(hostname)
-  fi
 }
 
 detect_runtime() {
@@ -102,27 +59,44 @@ detect_package_manager() {
   pm=${pm:-"npm"}
 }
 
+detect_os() {
+  if [ -z "$os" ]; then
+    case "$OSTYPE" in
+      darwin*) os="macOS" ;;
+      linux-gnu*) os="Linux" ;;
+      msys*|cygwin*|win32*) os="Windows" ;;
+      *) os="Unknown" ;;
+    esac
+  fi
+
+  if [[ "$os" == "macOS" ]]; then
+    os_version=$(sw_vers -productVersion)
+  elif [[ "$os" == "Linux" ]]; then
+    os_version=$(lsb_release -rs 2>/dev/null || echo "$(uname -r)")
+  elif [[ "$os" == "Windows" ]]; then
+    os_version=$(powershell -Command "(Get-CimInstance -Class Win32_OperatingSystem).Version")
+  else
+    os_version="Unknown"
+  fi
+
+  os_arch=$(uname -m)
+}
+
 os_info(){
   case "$os" in
-    "macOS") echo -e "$MACOS detected..." ;;
-    "Linux") echo -e "$LINUX detected..." ;;
+    "macOS") OS="$MACOS" ;;
+    "Linux") OS="$LINUX" ;;
     "Windows")
       if grep -q Microsoft /proc/version 2>/dev/null; then
-        echo -e "$WINDOWS Subsystem for $LINUX (WSL) detected..."
+        OS="$WINDOWS Subsystem for $LINUX (WSL)"
       else
-        echo -e "$WINDOWS detected..."
+        OS="$WINDOWS"
       fi
       ;;
-    *) echo -e "$UNKNOWN OS, type: $OSTYPE" ;;
+    *) OS="$UNKNOWN OS, type: $OSTYPE" ;;
   esac
-  
-  echo "OS: $os"
-  echo "OS Version: $os_version"
-  echo "OS Architecture: $os_architecture"
-  echo "OS CPU: $os_cpu"
-  echo "OS Kernel: $os_kernel"
-  echo "OS Hostname: $os_hostname"
-  echo "OS Uptime: $os_uptime"
+
+  echo -e "$OS ($os_version, $os_arch)"
 }
 
 detect_os
@@ -138,15 +112,11 @@ fi
 os_info
 
 {
-  echo "os=$os"
-  echo "os_version=$os_version"
-  echo "os_architecture=$os_architecture"
-  echo "os_cpu=$os_cpu"
-  echo "os_kernel=$os_kernel"
-  echo "os_hostname=$os_hostname"
-  echo "os_uptime=$os_uptime"
   echo "runtime=$runtime"
   echo "pm=$pm"
   echo "pm_version=$pm_version"
   echo "pm_lockfile=$pm_lockfile"
+  echo "os=$os"
+  echo "os_version=$os_version"
+  echo "os_arch=$os_arch"
 } >> "$GITHUB_ENV"
