@@ -63,20 +63,25 @@ detect_os() {
   if [ -z "$os" ]; then
     case "$OSTYPE" in
       darwin*) os="macOS" ;;
-      linux-gnu*) os="Linux" ;;
+      linux-gnu*)
+        os="Linux"
+        os_version=$(grep '^VERSION_ID' /etc/os-release 2>/dev/null | cut -d '=' -f 2 | tr -d '"')
+      ;;
       msys*|cygwin*|win32*) os="Windows" ;;
       *) os="Unknown" ;;
     esac
   fi
 
-  if [[ "$os" == "macOS" ]]; then
-    os_version=$(sw_vers -productVersion)
-  elif [[ "$os" == "Linux" ]]; then
-    os_version=$(lsb_release -rs 2>/dev/null || echo "$(uname -r)")
-  elif [[ "$os" == "Windows" ]]; then
-    os_version=$(powershell -Command "(Get-CimInstance -Class Win32_OperatingSystem).Version")
-  else
-    os_version="Unknown"
+  if [ -z "$os_version" ]; then
+    if [[ "$os" == "macOS" ]]; then
+      os_version=$(sw_vers -productVersion)
+    elif [[ "$os" == "Linux" ]]; then
+      os_version=$(lsb_release -rs 2>/dev/null || echo "$(uname -r)")
+    elif [[ "$os" == "Windows" ]]; then
+      os_version=$(powershell -Command "(Get-CimInstance -Class Win32_OperatingSystem).Version")
+    else
+      os_version="Unknown"
+    fi
   fi
 
   os_arch=$(uname -m)
