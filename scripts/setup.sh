@@ -8,7 +8,7 @@ pm=${pm:-""}
 pm_version=${pm_version:-"latest"}
 pm_lockfile=${pm_lockfile:-"none"}
 os=${os:-""}
-os_name=${os_name:-""}
+os_name=${os_name:-"$os"}
 os_version=${os_version:-""}
 os_arch=${os_arch:-""}
 
@@ -77,30 +77,44 @@ detect_os() {
       darwin*) os="darwin" ;;
       linux*) os="linux" ;;
       msys*|cygwin*|win32*) os="windows" ;;
-      *) os="unknown" ;;
+      *) os="$OSTYPE" ;;
+    esac
+  fi
+
+  if [ -n "$os_name" ]; then
+    if [[ "$os" =~ ^([a-zA-Z0-9\-]+)-([0-9\.]+)$ ]]; then
+      os_name="${BASH_REMATCH[1]}"
+    elif [[ "$os" =~ ^([a-zA-Z0-9\-]+)-latest$ ]]; then
+      os_name="${BASH_REMATCH[1]}"
+    fi
+
+    case "$os_name" in
+      ubuntu) os_name="Ubuntu" ;;
+      macos) os_name="macOS" ;;
+      windows) os_name="Windows" ;;
     esac
   fi
 
   if [[ "$os" == "darwin" ]]; then
-    os_name="macOS"
+    os_name=${os_name:-"macOS"}
     os_version=$(sw_vers -productVersion)
   elif [[ "$os" == "linux" ]]; then
     if [ -f "/etc/os-release" ]; then
       os_name=$(grep '^NAME=' /etc/os-release | cut -d '=' -f 2 | tr -d '"')
       os_version=$(grep '^VERSION_ID=' /etc/os-release | cut -d '=' -f 2 | tr -d '"')
     else
-      os_name="Generic"
+      os_name=${os_name:-"Generic"}
       os_version=$(lsb_release -rs 2>/dev/null || echo "$(uname -r)")
     fi
   elif [[ "$os" == "windows" ]]; then
-    os_name="Windows"
+    os_name=${os_name:-"Windows"}
     os_version=$(powershell -Command "(Get-CimInstance -Class Win32_OperatingSystem).Version")
   else
-    os_name="Unknown"
+    os_name=${os_name:-"Unknown"}
     os_version="unknown"
   fi
 
-  os_arch=$(normalize_arch $(uname -m))
+  normalize_arch $(uname -m)
 }
 
 os_info() {
@@ -114,7 +128,7 @@ os_info() {
       fi
       ;;
     "windows") OS="$WINDOWS" ;;
-    *) OS="$UNKNOWN OS, type: $OSTYPE" ;;
+    *) OS="$UNKNOWN $os" ;;
   esac
 
   echo -e "$OS ($os_name $os_version, $os_arch)"
