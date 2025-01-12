@@ -14,15 +14,6 @@ jobs:
         runtime: [node, deno, bun]
         version: ["latest"]
         pm: [npm, pnpm, yarn]
-        exclude:
-          - runtime: bun
-            pm: pnpm
-          - runtime: bun
-            pm: yarn
-          - runtime: deno
-            pm: pnpm
-          - runtime: deno
-            pm: yarn
     name: 👷 CI ${{ matrix.runtime }}@${{ matrix.version }} under ${{ matrix.os }} using ${{ matrix.pm }}
 
     timeout-minutes: 60
