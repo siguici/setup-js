@@ -65,7 +65,7 @@ runs:
         bash "${{ github.action_path }}/scripts/prepare.sh"
       shell: bash
 
-    - name: 🔍 Detect package manager
+    - name: 🔍 Detect the execution environment
       working-directory: ${{ inputs.cwd }}
       run: |
         chmod +x "${{ github.action_path }}/scripts/setup.sh"
@@ -78,9 +78,15 @@ runs:
 
     - name: 📋 Display detected values
       run: |
+        echo "Runtime: ${{ env.runtime }}"
         echo "Package Manager: ${{ env.pm }}"
         echo "Version: ${{ env.pm_version }}"
         echo "Lockfile: ${{ env.pm_lockfile }}"
+        echo "------------------------"
+        echo "Operating System: ${{ env.os }}"
+        echo "Name: ${{ env.os_name }}"
+        echo "Version: ${{ env.os_version }}"
+        echo "Architecture: ${{ env.os_arch }}"
       shell: bash
 
     - name: 📦 Setup PNPM
