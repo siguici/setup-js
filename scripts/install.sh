@@ -4,8 +4,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source "$SCRIPT_DIR/utils.sh"
 
-pm=${1:-"npm"}
-pm_version=${2:-"latest"}
+pm=${pm:-"npm"}
+pm_version=${pm_version:-"latest"}
 
 # Ensure prerequisites
 command -v jq &> /dev/null || panic "jq is not installed. Please install it and try again."
