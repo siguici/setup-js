@@ -38,7 +38,7 @@ update_pm() {
   fi
 
   if [[ "$current_version" != "$pm_version" ]]; then
-    info "Updating $pm to version $pm_version..."
+    info "Updating $pm version from $current_version to $pm_version..."
     $pm install -g "$pm@$pm_version" || panic "Failed to update $pm to version $pm_version."
   else
     info "$pm is already at the requested version $pm_version."
