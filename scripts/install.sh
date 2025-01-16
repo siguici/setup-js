@@ -58,7 +58,7 @@ install_or_update_pm() {
 
 install_or_update_pm $pm $pm_version
 
-# Handle package manager and runtime
+# Handle package manager
 if [[ "$pm" == "npm" || "$pm" == "pnpm" || "$pm" == "yarn" || "$pm" == "bun" ]]; then
   info "Preparing package.json for $pm..."
 

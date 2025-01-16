@@ -123,7 +123,6 @@ runs:
         bash "${{ github.action_path }}/scripts/install.sh"
       env:
         pm: ${{ env.pm }}
-        runtime: ${{ inputs.runtime }}
       shell: bash
 
     - name: 🔨 Execute scripts
