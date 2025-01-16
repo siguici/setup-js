@@ -7,12 +7,29 @@ source "$SCRIPT_DIR/utils.sh"
 pm=${pm:-"npm"}
 pm_version=${pm_version:-"latest"}
 
-# Ensure prerequisites
 command -v jq &> /dev/null || panic "jq is not installed. Please install it and try again."
 [[ -f "package.json" ]] || panic "No package.json found in the current working directory."
 
+check_and_fix_permissions() {
+  local dir=$1
+
+  if [[ ! -w "$dir" ]]; then
+    warning "Insufficient permissions to write in $dir."
+    if [[ $EUID -ne 0 ]]; then
+      warning "The script is not running as root."
+      info "Try fixing the permissions by running: sudo chown -R $(whoami):$(whoami) $dir"
+      return 1
+    else
+      info "Attempting to fix permissions for $dir..."
+      chown -R "$(whoami):$(whoami)" "$dir" || panic "Failed to fix permissions for $dir."
+    fi
+  fi
+  return 0
+}
+
 install_pm() {
   local pm=$1 pm_version=$2
+  local npm_global_prefix
 
   if command -v corepack &> /dev/null; then
     info "Installing $pm@$pm_version using Corepack..."
@@ -21,6 +38,8 @@ install_pm() {
   else
     warning "Corepack is not installed."
     info "Installing $pm@$pm_version globally via NPM..."
+    npm_global_prefix=$(npm config get prefix)
+    check_and_fix_permissions "$npm_global_prefix" || panic "Unable to fix permissions for $npm_global_prefix."
     npm install -g "$pm@$pm_version" || panic "Failed to install $pm@$pm_version globally via NPM."
   fi
 }
@@ -56,7 +75,6 @@ install_or_update_pm() {
   fi
 }
 
-# Handle package manager
 if [[ "$pm" == "npm" || "$pm" == "pnpm" || "$pm" == "yarn" || "$pm" == "bun" ]]; then
   install_or_update_pm $pm $pm_version
 
