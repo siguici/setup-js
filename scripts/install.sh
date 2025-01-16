@@ -56,10 +56,10 @@ install_or_update_pm() {
   fi
 }
 
-install_or_update_pm $pm $pm_version
-
 # Handle package manager
 if [[ "$pm" == "npm" || "$pm" == "pnpm" || "$pm" == "yarn" || "$pm" == "bun" ]]; then
+  install_or_update_pm $pm $pm_version
+
   info "Preparing package.json for $pm..."
 
   if [[ "$pm_version" == "latest" ]]; then
