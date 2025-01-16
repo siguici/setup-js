@@ -29,3 +29,4 @@ jobs:
           version: ${{ matrix.version }}
           pm: ${{ matrix.pm }}
           scripts: test
+          cwd: ./labs
