@@ -60,10 +60,9 @@ runs:
   using: 'composite'
   steps:
     - name: 🛠️ Prepare the environment
-      run: |
-        chmod +x "${{ github.action_path }}/scripts/prepare.sh"
-        bash "${{ github.action_path }}/scripts/prepare.sh"
-      shell: bash
+      uses: siguici/setup-env@v0
+      with:
+        packages: 'curl jq awk'
 
     - name: 🔍 Detect the execution environment
       working-directory: ${{ inputs.cwd }}
