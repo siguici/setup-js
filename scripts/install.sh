@@ -8,7 +8,7 @@ pm=${pm:-"npm"}
 pm_version=${pm_version:-"latest"}
 
 command -v jq &> /dev/null || panic "jq is not installed. Please install it and try again."
-[[ -f "package.json" ]] || panic "No package.json found in the current working directory."
+[[ -f "package.json" || "$pm" == "deno" ]] || panic "No package.json found in the current working directory."
 
 check_and_fix_permissions() {
   local dir=$1
@@ -76,7 +76,7 @@ install_or_update_pm() {
 }
 
 if [[ "$pm" == "npm" || "$pm" == "pnpm" || "$pm" == "yarn" || "$pm" == "bun" ]]; then
-  install_or_update_pm $pm $pm_version
+  install_or_update_pm "$pm" "$pm_version"
 
   info "Preparing package.json for $pm..."
 
