@@ -90,6 +90,8 @@ if [[ "$pm" == "npm" || "$pm" == "pnpm" || "$pm" == "yarn" || "$pm" == "bun" ]];
 
   if [[ "$pm" == "npm" ]]; then
     npm install --legacy-peer-deps || panic "npm install failed."
+  elif [[ "$pm" == "pnpm" ]]; then
+    pnpm install --dangerously-allow-all-builds || panic "npm install failed."
   else
     $pm install || panic "$pm install failed."
   fi
