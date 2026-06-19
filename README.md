@@ -169,13 +169,15 @@ The detection process follows these steps:
      - `pnpm-lock.yaml` → **pnpm**
      - `yarn.lock` → **yarn**
      - `package-lock.json` → **npm**
-     - `bun.lockb` → **bun**
+     - `bun.lock`/`bun.lockb` → **bun**
      - `deno.lock` → **deno**
+     - `lock.yaml` → **nub**
 
 3. **Runtime Environment**:
    - If no lock files are present, the runtime environment is checked:
      - If the runtime is **Deno**, the action defaults to **deno**.
      - If the runtime is **Bun**, the action defaults to **bun**.
+     - If the runtime is **Nub**, the action defaults to **nub**.
 
 4. **Fallback**:
    - If none of the above methods determine the package manager,
@@ -197,7 +199,7 @@ with:
 
 ## 📖 Notes
 
-- ✅ Node.js: If you choose Node.js as the runtime,
+- ✅ Node.js / Nub: If you choose Node.js or Nub as the runtime,
 the action will set up the specified version and install dependencies
 using your selected package manager (`npm`, `yarn`, `pnpm`).
 - ✅ Deno: For Deno, the action installs dependencies using `deno install`
