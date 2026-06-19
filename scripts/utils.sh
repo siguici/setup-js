@@ -63,7 +63,7 @@ get_message() {
   local script="$1"
 
   for key in "${!script_messages[@]}"; do
-    if [[ "$script" == $key || "$script" == $key:* || "$script" == $key.* || "$script" == *:$key || "$script" == *.$key ]]; then
+    if [[ "$script" == "$key" || "$script" == $key:* || "$script" == $key.* || "$script" == *:$key || "$script" == *.$key ]]; then
       echo "${script_messages[$key]} ($script)"
       return
     fi

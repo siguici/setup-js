@@ -5,11 +5,11 @@ branding:
   color: blue
 
 description: |
-  This action sets up the runtime, installs dependencies, and runs scripts for Node.js, Deno, or Bun.
+  This action sets up the runtime, installs dependencies, and runs scripts for Node.js, Deno, Bun, or Nub.
 
 inputs:
   runtime:
-    description: 'The runtime to use (node, deno, or bun)'
+    description: 'The runtime to use (node, deno, bun or nub)'
     required: false
     default: node
   version:
@@ -121,6 +121,20 @@ runs:
       uses: oven-sh/setup-bun@v2
       with:
         bun-version: ${{ inputs.version }}
+
+    - name: 🐳 Set up Nub
+      if: ${{ (inputs.runtime == 'nub' || env.pm == 'nub') && env.pm_lockfile }}
+      uses: nubjs/setup-nub@v0
+      with:
+        nub-version: ${{ inputs.version }}
+        cache: true
+        cache-dependency-path: ${{ env.pm_lockfile }}
+
+    - name: 🦄 Set up Nub
+      if: ${{ inputs.runtime == 'nub' || env.pm == 'nub' }}
+      uses: nubjs/setup-nub@v0
+      with:
+        nub-version: ${{ inputs.version }}
 
     - name: 📥 Install dependencies
       working-directory: ${{ inputs.cwd }}

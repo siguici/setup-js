@@ -15,8 +15,10 @@ os_arch=${os_arch:-""}
 
 parse_pm() {
   local input=$1
-  local name=$(echo "$input" | grep -o '^[^@]*')
-  local version=$(echo "$input" | grep -o '@.*' | sed 's/^@//' || echo "latest")
+  local name
+  local version
+  name=$(echo "$input" | grep -o '^[^@]*')
+  version=$(echo "$input" | grep -o '@.*' | sed 's/^@//' || echo "latest")
   echo "$name $version"
 }
 
@@ -26,6 +28,8 @@ detect_runtime() {
       runtime="bun"
     elif command -v deno &>/dev/null; then
       runtime="deno"
+    elif command -v nub &>/dev/null; then
+      runtime="nub"
     else
       runtime="node"
     fi
@@ -35,7 +39,7 @@ detect_runtime() {
 detect_pm() {
   if [ -n "$pm" ]; then
     read -r pm pm_version <<< "$(parse_pm "$pm")"
-    valid_pms=("npm" "yarn" "pnpm" "bun" "deno")
+    valid_pms=("npm" "yarn" "pnpm" "bun" "deno" "nub")
     if [[ ! " ${valid_pms[@]} " =~ " $pm " ]]; then
       panic "Invalid package manager '$pm'. Valid options are: ${valid_pms[*]}."
     fi
@@ -53,6 +57,7 @@ detect_pm() {
       [ -f "package-lock.json" ] && pm="npm" && pm_lockfile="package-lock.json"
       [ -f "bun.lockb" ] && pm="bun" && pm_lockfile="bun.lockb"
       [ -f "deno.lock" ] && pm="deno" && pm_lockfile="deno.lock"
+      [ -f "lock.yaml" ] && pm="nub" && pm_lockfile="lock.yaml"
       ;;
   esac
 

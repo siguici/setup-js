@@ -2,7 +2,7 @@
 
 This GitHub Action helps you set up a JavaScript/TypeScript runtime environment,
 install dependencies, and run common scripts (such as test, build, lint, deploy)
-for popular runtimes like Node.js, Deno, and Bun.
+for popular runtimes like Node.js, Deno, Bun and Nub.
 It supports multiple package managers (npm, yarn, pnpm)
 and works with scripts defined in package.json or runtime-specific files.
 
@@ -10,7 +10,7 @@ and works with scripts defined in package.json or runtime-specific files.
 
 ## 🚀 Features
 
-- Set up multiple runtimes: Node.js, Deno, and Bun
+- Set up multiple runtimes: Node.js, Deno, Bun, Nub
 - Supports popular package managers: npm, yarn, pnpm
 - Run common scripts: test, build, lint, deploy, etc.
 - Configurable runtime version: Specify the runtime version to use
@@ -52,7 +52,7 @@ jobs:
 
   - Description: The runtime to use.
   - Default: `node`
-  - Options: `node`, `deno`, `bun`
+  - Options: `node`, `deno`, `bun`, `nub`
   - Example: `deno`
 
 - **version** (optional)
@@ -83,7 +83,7 @@ jobs:
 
 - **runtime**
   - Description: The runtime used.
-  - Example: `node`, `deno`, `bun`
+  - Example: `node`, `deno`, `bun`, `nub`
 
 - **pm**
   - Description: The package manager used.

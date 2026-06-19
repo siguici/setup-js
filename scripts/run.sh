@@ -11,19 +11,19 @@ fi
 IFS=',' read -ra scripts <<< "$scripts"
 
 for script in "${scripts[@]}"; do
-  message $script
+  message "$script"
 
   case "$pm" in
-  "npm"|"bun")
-    $pm run $script
+  "npm"|"bun"|"nub")
+    $pm run "$script"
     success "$pm run $script executed"
     ;;
   "pnpm"|"yarn")
-    $pm $script
+    "$pm" "$script"
     success "$pm $script executed"
     ;;
   "deno")
-    deno task $script
+    deno task "$script"
     success "deno task $script executed"
     ;;
   *)
