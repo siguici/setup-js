@@ -7,7 +7,8 @@
     "setup-js",
     "setup-node",
     "setup-deno",
-    "setup-bun"
+    "setup-bun",
+    "setup-nub"
   ],
   "homepage": "https://github.com/siguici/setup-js#readme",
   "bugs": "https://github.com/siguici/setup-js/issues",
@@ -22,10 +23,10 @@
     "check": "tsc --noEmit && biome ci .",
     "check:format": "biome format .",
     "check:lint": "biome check .",
-    "fix": "pnpm lint && pnpm format",
+    "fix": "nub lint && nub format",
     "format": "biome format --write .",
     "lint": "biome check --write .",
-    "test": "node --loader tsm --enable-source-maps bin/test.ts"
+    "test": "nub bin/test.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
@@ -35,5 +36,13 @@
     "tslib": "^2.8.1",
     "tsm": "^2.3.0",
     "typescript": "^5.7.3"
+  },
+  "packageManager": "nub@0.1.4",
+  "devEngines": {
+    "packageManager": {
+      "name": "nub",
+      "version": "^0.1.4",
+      "onFail": "warn"
+    }
   }
 }
