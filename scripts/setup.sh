@@ -55,6 +55,7 @@ detect_pm() {
       [ -f "pnpm-lock.yaml" ] && pm="pnpm" && pm_lockfile="pnpm-lock.yaml"
       [ -f "yarn.lock" ] && pm="yarn" && pm_lockfile="yarn.lock"
       [ -f "package-lock.json" ] && pm="npm" && pm_lockfile="package-lock.json"
+      [ -f "bun.lock" ] && pm="bun" && pm_lockfile="bun.lock"
       [ -f "bun.lockb" ] && pm="bun" && pm_lockfile="bun.lockb"
       [ -f "deno.lock" ] && pm="deno" && pm_lockfile="deno.lock"
       [ -f "lock.yaml" ] && pm="nub" && pm_lockfile="lock.yaml"
