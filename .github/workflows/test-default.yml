@@ -42,7 +42,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: 🔥 Remove lockfile
-        run: rm ./labs/lock.yaml
+        run: rm ./labs/pnpm-lock.yaml
 
       - name: Setup Test Environment
         uses: ./

@@ -23,10 +23,10 @@
     "check": "tsc --noEmit && biome ci .",
     "check:format": "biome format .",
     "check:lint": "biome check .",
-    "fix": "nub lint && nub format",
+    "fix": "pnpm lint && pnpm format",
     "format": "biome format --write .",
     "lint": "biome check --write .",
-    "test": "nub bin/test.ts"
+    "test": "node bin/test.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
@@ -36,13 +36,5 @@
     "tslib": "^2.8.1",
     "tsm": "^2.3.0",
     "typescript": "^5.7.3"
-  },
-  "packageManager": "nub@0.1.4",
-  "devEngines": {
-    "packageManager": {
-      "name": "nub",
-      "version": "^0.1.4",
-      "onFail": "warn"
-    }
   }
 }
