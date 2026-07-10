@@ -24,18 +24,18 @@ parse_pm() {
 
 detect_runtime() {
   if [ -z "$runtime" ]; then
-    if command -v bun &>/dev/null; then
+    if [ -f "$cwd/deno.json" ] || [ -f "$cwd/deno.jsonc" ]; then
+      runtime="deno"
+    elif [ -f "$cwd/bun.lock" ] || [ -f "$cwd/bun.lockb" ]; then
+      runtime="bun"
+    elif command -v bun &>/dev/null; then
       runtime="bun"
     elif command -v deno &>/dev/null; then
       runtime="deno"
-    elif command -v nub &>/dev/null; then
-      runtime="nub"
     else
       runtime="node"
     fi
   fi
-
-  [ -f "$cwd/deno.json" ] && runtime="deno"
 }
 
 detect_pm() {
@@ -52,7 +52,6 @@ detect_pm() {
     fi
   fi
 
-  # 2. Résolution du lockfile (indépendamment ou pour confirmer le pm)
   local detected_lock=""
   if [ -f "$cwd/bun.lock" ]; then detected_lock="bun.lock"; [ -z "$pm" ] && pm="bun"; fi
   if [ -f "$cwd/bun.lockb" ]; then detected_lock="bun.lockb"; [ -z "$pm" ] && pm="bun"; fi
@@ -61,6 +60,14 @@ detect_pm() {
   if [ -f "$cwd/pnpm-lock.yaml" ]; then detected_lock="pnpm-lock.yaml"; [ -z "$pm" ] && pm="pnpm"; fi
   if [ -f "$cwd/yarn.lock" ]; then detected_lock="yarn.lock"; [ -z "$pm" ] && pm="yarn"; fi
   if [ -f "$cwd/package-lock.json" ]; then detected_lock="package-lock.json"; [ -z "$pm" ] && pm="npm"; fi
+
+  local search_dir="$cwd"
+  while [[ "$search_dir" != "." && "$search_dir" != "/" ]]; do
+    if [ -f "$search_dir/pnpm-lock.yaml" ]; then detected_lock="pnpm-lock.yaml"; pm="pnpm"; break; fi
+    if [ -f "$search_dir/yarn.lock" ]; then detected_lock="yarn.lock"; pm="yarn"; break; fi
+    if [ -f "$search_dir/package-lock.json" ]; then detected_lock="package-lock.json"; pm="npm"; break; fi
+    search_dir=$(dirname "$search_dir")
+  done
 
   pm="${pm:-$runtime}"
   pm="${pm//node/npm}"
@@ -125,7 +132,7 @@ detect_os() {
     fi
   elif [[ "$os" == "windows" ]]; then
     os_name=${os_name:-"Windows"}
-    os_version=$(powershell -Command "(Get-CimInstance -Class Win32_OperatingSystem).Version" 2>/dev/null || echo "unknown")
+    os_version=$(cmd.exe /c ver 2>/dev/null | grep -oP 'Version \K[0-9\.]+' || powershell -Command "(Get-CimInstance -Class Win32_OperatingSystem).Version" 2>/dev/null || echo "10.0")
   else
     os_name=${os_name:-"Unknown"}
     os_version="unknown"
