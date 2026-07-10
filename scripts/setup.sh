@@ -34,6 +34,8 @@ detect_runtime() {
       runtime="node"
     fi
   fi
+
+  [ -f "$cwd/deno.json" ] && runtime="deno"
 }
 
 detect_pm() {
@@ -43,31 +45,29 @@ detect_pm() {
     if [[ ! " ${valid_pms[@]} " =~ " $pm " ]]; then
       panic "Invalid package manager '$pm'. Valid options are: ${valid_pms[*]}."
     fi
-  elif [ -f "package.json" ]; then
-    local pkg_manager=$(jq -r '.packageManager // empty' package.json 2>/dev/null || true)
+  elif [ -f "$cwd/package.json" ]; then
+    local pkg_manager=$(jq -r '.packageManager // empty' "$cwd/package.json" 2>/dev/null || true)
     if [ -n "$pkg_manager" ]; then
       read -r pm pm_version <<< "$(parse_pm "$pkg_manager")"
     fi
   fi
 
-  case "$pm" in
-    "" )
-      [ -f "pnpm-lock.yaml" ] && pm="pnpm" && pm_lockfile="pnpm-lock.yaml"
-      [ -f "yarn.lock" ] && pm="yarn" && pm_lockfile="yarn.lock"
-      [ -f "package-lock.json" ] && pm="npm" && pm_lockfile="package-lock.json"
-      [ -f "bun.lock" ] && pm="bun" && pm_lockfile="bun.lock"
-      [ -f "bun.lockb" ] && pm="bun" && pm_lockfile="bun.lockb"
-      [ -f "deno.lock" ] && pm="deno" && pm_lockfile="deno.lock"
-      [ -f "lock.yaml" ] && pm="nub" && pm_lockfile="lock.yaml"
-      ;;
-  esac
+  # 2. Résolution du lockfile (indépendamment ou pour confirmer le pm)
+  local detected_lock=""
+  if [ -f "$cwd/bun.lock" ]; then detected_lock="bun.lock"; [ -z "$pm" ] && pm="bun"; fi
+  if [ -f "$cwd/bun.lockb" ]; then detected_lock="bun.lockb"; [ -z "$pm" ] && pm="bun"; fi
+  if [ -f "$cwd/deno.lock" ]; then detected_lock="deno.lock"; [ -z "$pm" ] && pm="deno"; fi
+  if [ -f "$cwd/lock.yaml" ]; then detected_lock="lock.yaml"; [ -z "$pm" ] && pm="nub"; fi
+  if [ -f "$cwd/pnpm-lock.yaml" ]; then detected_lock="pnpm-lock.yaml"; [ -z "$pm" ] && pm="pnpm"; fi
+  if [ -f "$cwd/yarn.lock" ]; then detected_lock="yarn.lock"; [ -z "$pm" ] && pm="yarn"; fi
+  if [ -f "$cwd/package-lock.json" ]; then detected_lock="package-lock.json"; [ -z "$pm" ] && pm="npm"; fi
 
   pm="${pm:-$runtime}"
   pm="${pm//node/npm}"
   pm=${pm:-"npm"}
 
-  if [[ -n "$pm_lockfile" && "$pm_lockfile" != "none" ]]; then
-    pm_lockfile="$cwd/$pm_lockfile"
+  if [ -n "$detected_lock" ]; then
+    pm_lockfile="$cwd/$detected_lock"
   else
     pm_lockfile=""
   fi
@@ -101,7 +101,7 @@ detect_os() {
       os_name="${BASH_REMATCH[1]}"
     fi
 
-    case "$os_name" in
+    case "${os_name,,}" in
       ubuntu) os_name="Ubuntu" ;;
       macos) os_name="macOS" ;;
       windows) os_name="Windows" ;;
@@ -125,13 +125,13 @@ detect_os() {
     fi
   elif [[ "$os" == "windows" ]]; then
     os_name=${os_name:-"Windows"}
-    os_version=$(powershell -Command "(Get-CimInstance -Class Win32_OperatingSystem).Version")
+    os_version=$(powershell -Command "(Get-CimInstance -Class Win32_OperatingSystem).Version" 2>/dev/null || echo "unknown")
   else
     os_name=${os_name:-"Unknown"}
     os_version="unknown"
   fi
 
-  normalize_arch $(uname -m)
+  normalize_arch "$(uname -m)"
 }
 
 os_info() {
